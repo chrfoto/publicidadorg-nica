@@ -3,99 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Envío de Fotos - CHRFOTOGRAFÍA</title>
+    <title>CHRFOTOGRAFÍA - Panel de Envíos</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-stone-50 text-stone-800 p-8">
-    <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="max-w-6xl mx-auto space-y-6">
         
-        <!-- Panel Izquierdo: Controles -->
-        <div class="md:col-span-1 space-y-6">
-            <header class="mb-4">
-                <h1 class="text-2xl font-serif font-bold text-stone-900 tracking-tight">CHRFOTOGRAFÍA</h1>
-                <p class="text-stone-500 text-sm mt-1">Panel de Envío Automático - FIRESTORE</p>
-            </header>
+        <!-- Barra superior con las Pestañas de Eventos Guardados -->
+        <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <h1 class="text-xl font-serif font-bold text-stone-900 tracking-tight">CHRFOTOGRAFÍA</h1>
+                <span class="text-xs bg-stone-100 text-stone-600 px-2.5 py-1 rounded-md font-medium">Gestor de Envíos</span>
+            </div>
+            <!-- Contenedor de pestañas guardadas -->
+            <div id="pestanas-container" class="flex flex-wrap gap-2 items-center">
+                <!-- Se cargan dinámicamente -->
+            </div>
+        </div>
 
-            <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-4">
-                <h2 class="font-medium text-stone-800 text-sm flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    Configuración del Evento
-                </h2>
-                
-                <div>
-                    <label class="block text-xs text-stone-500 mb-1">Nombre de los Novios</label>
-                    <input type="text" id="input-novios" value="Alex & Estrella" class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Panel Izquierdo: Controles -->
+            <div class="md:col-span-1 space-y-6">
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h2 class="font-medium text-stone-800 text-sm flex items-center gap-2">Configuración del Evento</h2>
+                        <button id="btn-nuevo" class="text-xs text-stone-500 hover:text-stone-900 underline">Limpiar / Nuevo</button>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs text-stone-500 mb-1">Nombre de los Novios</label>
+                        <input type="text" id="input-novios" placeholder="Ej. Alex & Estrella" class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">
+                    </div>
 
-                <div>
-                    <label class="block text-xs text-stone-500 mb-1">Enlace de la Galería</label>
-                    <input type="text" id="input-link" value="https://chrfotografia.pixieset.com/alexandestrella/" class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">
-                </div>
+                    <div>
+                        <label class="block text-xs text-stone-500 mb-1">Enlace de la Galería (Pixieset)</label>
+                        <input type="text" id="input-link" placeholder="https://chrfotografia.pixieset.com/..." class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">
+                    </div>
 
-                <div>
-                    <label class="block text-xs text-stone-500 mb-1">Configuración de Firebase</label>
-                    <textarea id="input-config" rows="5" class="w-full border border-stone-200 rounded-md p-2 text-xs font-mono text-stone-600 focus:ring-2 focus:ring-stone-900 outline-none bg-stone-50" placeholder="Pega el código de Firebase aquí..."></textarea>
-                </div>
+                    <div>
+                        <label class="block text-xs text-stone-500 mb-1">Configuración de Firebase</label>
+                        <textarea id="input-config" rows="4" class="w-full border border-stone-200 rounded-md p-2 text-xs font-mono text-stone-600 focus:ring-2 focus:ring-stone-900 outline-none bg-stone-50" placeholder="Pega el código de Firebase aquí..."></textarea>
+                    </div>
 
-                <div>
-                    <label class="block text-xs text-stone-500 mb-1">Plantilla del Mensaje</label>
-                    <textarea id="input-mensaje" rows="5" class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">¿Recuerdas lo increíble que la pasaste en la boda de {novios}? En el siguiente enlace podrás encontrar tus fotos y ver lo mucho que te divertiste con ellos:
+                    <div>
+                        <label class="block text-xs text-stone-500 mb-1">Plantilla del Mensaje</label>
+                        <textarea id="input-mensaje" rows="4" class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">¿Recuerdas lo increíble que la pasaste en la boda de {novios}? En el siguiente enlace podrás encontrar tus fotos y ver lo mucho que te divertiste con ellos:
 
 {link}
 
 Soy Chris, el fotógrafo de {novios}. 📸</textarea>
-                </div>
-
-                <div class="bg-stone-100 p-3 rounded-md">
-                    <label class="block text-[11px] font-medium text-stone-700 mb-1">Búsqueda Automática</label>
-                    <p class="text-[10px] text-stone-500">El sistema buscará por sí solo dónde están los registros (ya no necesitas adivinar rutas).</p>
-                </div>
-
-                <button id="btn-conectar" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-medium py-3 rounded-md transition shadow-sm text-sm">
-                    Buscar y Cargar Tabla Automáticamente
-                </button>
-
-                <div id="mensaje-error" class="hidden bg-red-50 border border-red-200 text-red-700 p-3 rounded-md text-xs"></div>
-            </div>
-        </div>
-
-        <!-- Panel Derecho: Tabla interactiva -->
-        <div class="md:col-span-2">
-            <div class="bg-white shadow-sm rounded-xl border border-stone-200 overflow-hidden flex flex-col h-full">
-                <div class="p-4 border-b border-stone-200 bg-stone-50 flex justify-between items-center">
-                    <h3 class="font-medium text-stone-800 text-sm" id="titulo-tabla">Lista de Invitados (Automático)</h3>
-                    <div class="flex items-center gap-4">
-                        <input type="text" id="buscador" placeholder="Buscar invitado..." class="border border-stone-200 rounded-md px-3 py-1.5 text-xs focus:ring-2 focus:ring-stone-900 outline-none hidden">
-                        <span id="contador" class="text-xs text-stone-500 font-medium">0 de 0 enviados</span>
                     </div>
+
+                    <div class="flex gap-2">
+                        <button id="btn-guardar" class="flex-1 bg-stone-200 hover:bg-stone-300 text-stone-800 font-medium py-2.5 rounded-md transition text-xs">
+                            Guardar en Pestañas
+                        </button>
+                        <button id="btn-conectar" class="flex-1 bg-stone-900 hover:bg-stone-800 text-white font-medium py-2.5 rounded-md transition shadow-sm text-xs">
+                            Cargar Invitados
+                        </button>
+                    </div>
+
+                    <div id="mensaje-error" class="hidden bg-red-50 border border-red-200 text-red-700 p-3 rounded-md text-xs"></div>
                 </div>
-                
-                <div class="overflow-y-auto flex-1 p-0">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="bg-stone-100 text-stone-500 text-[10px] uppercase tracking-wider sticky top-0 shadow-sm">
-                            <tr>
-                                <th class="p-3 pl-6 font-medium">Invitado</th>
-                                <th class="p-3 font-medium">Teléfono</th>
-                                <th class="p-3 pr-6 text-right font-medium">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabla-invitados" class="divide-y divide-stone-100 text-sm">
-                            <tr>
-                                <td colspan="3" class="p-12 text-center text-stone-400 text-xs">
-                                    <svg class="w-8 h-8 mx-auto mb-3 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                                    Listo para buscar
-                                    <p class="mt-1 text-[10px]">Pega tu configuración y haz clic en el botón de la izquierda.</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            </div>
+
+            <!-- Panel Derecho: Tabla interactiva -->
+            <div class="md:col-span-2">
+                <div class="bg-white shadow-sm rounded-xl border border-stone-200 overflow-hidden flex flex-col h-[650px]">
+                    <div class="p-4 border-b border-stone-200 bg-stone-50 flex justify-between items-center">
+                        <h3 class="font-medium text-stone-800 text-sm" id="titulo-tabla">Selecciona o carga un evento</h3>
+                        <div class="flex items-center gap-4">
+                            <input type="text" id="buscador" placeholder="Buscar invitado..." class="border border-stone-200 rounded-md px-3 py-1.5 text-xs focus:ring-2 focus:ring-stone-900 outline-none hidden">
+                            <span id="contador" class="text-xs text-stone-500 font-medium">0 de 0 enviados</span>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-y-auto flex-1 p-0">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-stone-100 text-stone-500 text-[10px] uppercase tracking-wider sticky top-0 shadow-sm">
+                                <tr>
+                                    <th class="p-3 pl-6 font-medium">Invitado</th>
+                                    <th class="p-3 font-medium">Teléfono</th>
+                                    <th class="p-3 pr-6 text-right font-medium">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-invitados" class="divide-y divide-stone-100 text-sm">
+                                <tr>
+                                    <td colspan="3" class="p-16 text-center text-stone-400 text-xs">
+                                        <svg class="w-8 h-8 mx-auto mb-3 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                        Tu espacio de trabajo está listo
+                                        <p class="mt-1 text-[10px]">Carga una boda guardada arriba o registra una nueva desde el panel izquierdo.</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Función recursiva para explorar colecciones automáticamente hasta encontrar documentos con teléfonos
+        // Sistema de Pestañas y Guardado Local
+        function obtenerBodsGuardadas() {
+            return JSON.parse(localStorage.getItem('chr_bodas_eventos') || '{}');
+        }
+
+        function renderPestanas() {
+            const container = document.getElementById('pestanas-container');
+            const bodas = obtenerBodsGuardadas();
+            container.innerHTML = '';
+
+            const keys = Object.keys(bodas);
+            if (keys.length === 0) {
+                container.innerHTML = `<span class="text-xs text-stone-400 italic">No hay bodas guardadas aún.</span>`;
+                return;
+            }
+
+            keys.forEach(id => {
+                const boda = bodas[id];
+                const btnWrapper = document.createElement('div');
+                btnWrapper.className = "flex items-center bg-stone-100 border border-stone-200 rounded-lg overflow-hidden text-xs";
+                
+                const btnSelect = document.createElement('button');
+                btnSelect.className = "px-3 py-1.5 font-medium text-stone-700 hover:bg-stone-200 transition";
+                btnSelect.innerText = boda.novios;
+                btnSelect.onclick = () => cargarBodaEnPanel(id);
+
+                const btnDelete = document.createElement('button');
+                btnDelete.className = "px-2 py-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 transition border-l border-stone-200";
+                btnDelete.innerHTML = "×";
+                btnDelete.title = "Eliminar boda";
+                btnDelete.onclick = (e) => {
+                    e.stopPropagation();
+                    if(confirm(`¿Eliminar la boda de ${boda.novios} de tus pestañas?`)) {
+                        delete bodas[id];
+                        localStorage.setItem('chr_bodas_eventos', JSON.stringify(bodas));
+                        renderPestanas();
+                    }
+                };
+
+                btnWrapper.appendChild(btnSelect);
+                btnWrapper.appendChild(btnDelete);
+                container.appendChild(btnWrapper);
+            });
+        }
+
+        function cargarBodaEnPanel(id) {
+            const bodas = obtenerBodsGuardadas();
+            const boda = bodas[id];
+            if (!boda) return;
+
+            document.getElementById('input-novios').value = boda.novios;
+            document.getElementById('input-link').value = boda.link;
+            document.getElementById('input-config').value = boda.config;
+            document.getElementById('input-mensaje').value = boda.mensaje;
+            
+            // Disparar carga automática al hacer clic en la pestaña
+            document.getElementById('btn-conectar').click();
+        }
+
+        document.getElementById('btn-guardar').addEventListener('click', () => {
+            const novios = document.getElementById('input-novios').value.trim();
+            if (!novios) {
+                alert("Por favor ingresa al menos el nombre de los novios para guardar la pestaña.");
+                return;
+            }
+
+            const id = novios.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            const bodas = obtenerBodsGuardadas();
+
+            bodas[id] = {
+                novios: novios,
+                link: document.getElementById('input-link').value,
+                config: document.getElementById('input-config').value,
+                mensaje: document.getElementById('input-mensaje').value
+            };
+
+            localStorage.setItem('chr_bodas_eventos', JSON.stringify(bodas));
+            renderPestanas();
+            alert(`¡Boda de ${novios} guardada en tus pestañas permanentes!`);
+        });
+
+        document.getElementById('btn-nuevo').addEventListener('click', () => {
+            document.getElementById('input-novios').value = '';
+            document.getElementById('input-link').value = '';
+            document.getElementById('input-config').value = '';
+            document.getElementById('tabla-invitados').innerHTML = `<tr><td colspan="3" class="p-16 text-center text-stone-400 text-xs">Panel limpio. Ingresa datos nuevos o guarda una pestaña.</td></tr>`;
+            document.getElementById('contador').innerText = "0 de 0 enviados";
+        });
+
+        // Motor de búsqueda y conexión a Firestore (Heredado del paso anterior)
         async function encontrarDocumentos(baseUrl, parentPath = '') {
             try {
                 const res = await fetch(baseUrl + (parentPath ? '/' + parentPath : ''));
@@ -104,28 +202,18 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                 
                 let documentsFound = [];
                 if (data.documents) {
-                    // Verificamos si estos documentos tienen campos de teléfono
                     for (const doc of data.documents) {
                         const fields = doc.fields || {};
                         const hasPhone = Object.keys(fields).some(k => ['telefono', 'phone', 'celular', 'Telefono'].includes(k.toLowerCase()));
-                        if (hasPhone) {
-                            documentsFound.push(doc);
-                        }
+                        if (hasPhone) documentsFound.push(doc);
                     }
                 }
-
-                // Si encontramos documentos aquí, los regresamos
                 if (documentsFound.length > 0) return documentsFound;
 
-                // Si no, buscamos en las subcolecciones de los documentos actuales
                 if (data.documents) {
                     for (const doc of data.documents) {
                         const docName = doc.name.split('/').pop();
                         const subPath = parentPath ? `${parentPath}/${docName}` : docName;
-                        
-                        // Listar subcolecciones de este documento
-                        const subRes = await fetch(`https://firestore.googleapis.com/v1/${doc.name}?mask.fieldPaths=__name__`);
-                        // Intentamos buscar rutas comunes de plantillas web (como 'public', 'data', 'rsvps')
                         const commonPaths = ['public', 'data', 'rsvps', 'invitados', 'guests', 'registros'];
                         for (const cp of commonPaths) {
                             const testPath = `${subPath}/${cp}`;
@@ -135,9 +223,7 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                     }
                 }
                 return [];
-            } catch (e) {
-                return [];
-            }
+            } catch (e) { return []; }
         }
 
         document.getElementById('btn-conectar').addEventListener('click', async () => {
@@ -151,15 +237,15 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
             const plantilla = document.getElementById('input-mensaje').value;
 
             errorDiv.classList.add('hidden');
-            btn.innerText = "Escaneando Firestore...";
+            btn.innerText = "Cargando...";
             btn.disabled = true;
 
             const projectIdMatch = configText.match(/(?:projectId["']?\s*:\s*["'])([^"']+)/i);
             
             if (!projectIdMatch) {
-                errorDiv.innerHTML = "⚠️ No se encontró el 'projectId' en el texto. Asegúrate de pegar el código de Firebase.";
+                errorDiv.innerHTML = "⚠️ Falta el 'projectId' en la configuración de Firebase.";
                 errorDiv.classList.remove('hidden');
-                btn.innerText = "Buscar y Cargar Tabla Automáticamente";
+                btn.innerText = "Cargar Invitados";
                 btn.disabled = false;
                 return;
             }
@@ -168,34 +254,24 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
             const baseUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents`;
 
             try {
-                // Rutas inteligentes comunes donde las plantillas guardan los datos
                 const rutasPrueba = [
                     "artifacts/" + projectId + "/public/data/rsvps",
                     "artifacts/" + projectId + "/public",
-                    "invitados",
-                    "rsvps",
-                    "registros",
-                    "guests",
-                    "data/rsvps"
+                    "invitados", "rsvps", "registros", "guests", "data/rsvps"
                 ];
 
                 let documents = [];
-                let rutaEncontrada = "";
-
-                // Intentamos primero con las rutas comunes conocidas
                 for (const ruta of rutasPrueba) {
                     const res = await fetch(`${baseUrl}/${ruta}?pageSize=300`);
                     if (res.ok) {
                         const json = await res.json();
                         if (json.documents && json.documents.length > 0) {
                             documents = json.documents;
-                            rutaEncontrada = ruta;
                             break;
                         }
                     }
                 }
 
-                // Si no se halló de forma directa, lanzamos el buscador automático global
                 if (documents.length === 0) {
                     const rootRes = await fetch(baseUrl);
                     const rootJson = await rootRes.json();
@@ -209,13 +285,13 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                 }
 
                 if (documents.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-amber-600 font-medium text-sm">No se encontraron registros de invitados automáticamente. Verifica que existan datos en tu Firestore.</td></tr>`;
-                    btn.innerText = "Buscar y Cargar Tabla Automáticamente";
+                    tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-amber-600 font-medium text-sm">No se encontraron registros de invitados en este proyecto.</td></tr>`;
+                    btn.innerText = "Cargar Invitados";
                     btn.disabled = false;
                     return;
                 }
 
-                document.getElementById('titulo-tabla').innerText = `Lista de Invitados (Conectado)`;
+                document.getElementById('titulo-tabla').innerText = `Lista de Invitados - ${novios}`;
                 tbody.innerHTML = '';
                 let total = 0;
                 let enviados = 0;
@@ -227,7 +303,6 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                     if (!fields) return;
 
                     const extractValue = (field) => field ? (field.stringValue || field.integerValue || field.doubleValue || "") : "";
-                    
                     const nombre = extractValue(fields.nombre || fields.name || fields.Nombre) || "Invitado";
                     const telefono = String(extractValue(fields.telefono || fields.phone || fields.celular || fields.Telefono)).trim();
                     const docId = doc.name.split('/').pop() || String(index);
@@ -265,15 +340,14 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
 
             } catch (error) {
                 console.error(error);
-                errorDiv.innerHTML = `🚨 <strong>Error de lectura.</strong> Revisa que las reglas de Firestore permitan la lectura (` + "`allow read, write: if true;`" + `).`;
+                errorDiv.innerHTML = `🚨 Error de lectura. Revisa las reglas de Firestore.`;
                 errorDiv.classList.remove('hidden');
             }
 
-            btn.innerText = "Buscar y Cargar Tabla Automáticamente";
+            btn.innerText = "Cargar Invitados";
             btn.disabled = false;
         });
 
-        // Buscador en vivo
         document.getElementById('buscador').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             const filas = document.querySelectorAll('#tabla-invitados tr');
@@ -287,7 +361,6 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
         window.marcarEnviado = function(element, storageKey, docId) {
             const row = element.closest('tr');
             row.classList.add('opacity-40', 'bg-stone-50');
-            
             element.innerText = 'Enviado ✓';
             element.classList.remove('bg-stone-900', 'hover:bg-stone-800');
             element.classList.add('bg-emerald-600');
@@ -296,13 +369,15 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
             if (!enviados.includes(docId)) {
                 enviados.push(docId);
                 localStorage.setItem(storageKey, JSON.stringify(enviados));
-                
                 const contador = document.getElementById('contador');
                 const parts = contador.innerText.split(' ');
                 parts[0] = parseInt(parts[0]) + 1;
                 contador.innerText = parts.join(' ');
             }
         }
+
+        // Cargar las pestañas guardadas al abrir la app
+        renderPestanas();
     </script>
 </body>
 </html>
