@@ -185,6 +185,13 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                 const jsonCorregido = jsonStr.replace(/'/g, '"');
                 
                 firebaseConfig = JSON.parse(jsonCorregido);
+                
+                // AUTO-GENERAR databaseURL si falta (¡LA SOLUCIÓN AL PROBLEMA!)
+                if (!firebaseConfig.databaseURL && firebaseConfig.projectId) {
+                    // Intenta con el formato estándar de bases de datos en Firebase
+                    firebaseConfig.databaseURL = `https://${firebaseConfig.projectId}-default-rtdb.firebaseio.com`;
+                }
+
                 proyectoActualId = firebaseConfig.projectId; // Guardamos ID para la memoria local
 
                 if(!firebaseConfig.projectId) {
