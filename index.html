@@ -52,7 +52,18 @@
                             <button type="button" onclick="pegarEjemploFirebase()" class="text-xs text-blue-600 hover:underline">Ver Ejemplo</button>
                         </label>
                         <p class="text-xs text-stone-500 mb-2">Pega solo la parte que está entre las llaves { ... } del `firebaseConfig`.</p>
-                        <textarea id="input-firebase" rows="8" placeholder='{\n  "apiKey": "AIzaSy...",\n  "authDomain": "...",\n  "databaseURL": "...",\n  "projectId": "..."\n}' required class="w-full px-3 py-2 border border-stone-300 rounded-lg font-mono text-xs focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent transition resize-none"></textarea>
+                        <textarea id="input-firebase" rows="6" placeholder='{\n  "apiKey": "AIzaSy...",\n  "authDomain": "...",\n  "databaseURL": "...",\n  "projectId": "..."\n}' required class="w-full px-3 py-2 border border-stone-300 rounded-lg font-mono text-xs focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent transition resize-none"></textarea>
+                    </div>
+
+                    <!-- Plantilla del Mensaje (NUEVO) -->
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-1">Plantilla del Mensaje</label>
+                        <p class="text-xs text-stone-500 mb-2">Usa <b>{novios}</b> y <b>{link}</b> para que se llenen automáticamente.</p>
+                        <textarea id="input-mensaje" rows="5" required class="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent transition resize-none">¿Recuerdas lo increíble que la pasaste en la boda de {novios}? En el siguiente enlace podrás encontrar tus fotos y ver lo mucho que te divertiste con ellos:
+
+{link}
+
+Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                     </div>
 
                     <!-- Nombre del nodo en base de datos -->
@@ -85,12 +96,18 @@
 
                 <!-- Tabla de Resultados (Oculta por defecto) -->
                 <div id="contenedor-tabla" class="hidden bg-white shadow-sm rounded-xl overflow-hidden border border-stone-200 fade-in">
-                    <div class="bg-stone-900 text-white p-4 flex justify-between items-center">
+                    <div class="bg-stone-900 text-white p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div>
                             <h3 class="font-medium" id="titulo-tabla-novios">Invitados de [Novios]</h3>
-                            <p class="text-stone-400 text-xs mt-1">Total cargados: <span id="contador-invitados">0</span></p>
+                            <p class="text-stone-400 text-xs mt-1">Progreso: <span id="contador-enviados" class="text-emerald-400 font-bold">0</span> / <span id="contador-invitados">0</span> enviados</p>
                         </div>
-                        <button onclick="reiniciarPanel()" class="text-xs bg-stone-800 hover:bg-stone-700 px-3 py-1.5 rounded transition">
+                        
+                        <!-- Buscador (NUEVO) -->
+                        <div class="w-full sm:w-auto relative">
+                            <input type="text" id="input-buscador" placeholder="Buscar invitado..." class="w-full sm:w-64 bg-stone-800 text-white text-sm px-3 py-1.5 rounded border border-stone-700 focus:outline-none focus:border-stone-500 transition placeholder-stone-500">
+                        </div>
+
+                        <button onclick="reiniciarPanel()" class="text-xs bg-stone-800 hover:bg-stone-700 px-3 py-1.5 rounded transition shrink-0">
                             Cargar Otro Evento
                         </button>
                     </div>
@@ -131,6 +148,12 @@
         const tablaInvitados = document.getElementById('tabla-invitados');
         const tituloTablaNovios = document.getElementById('titulo-tabla-novios');
         const contadorInvitados = document.getElementById('contador-invitados');
+        const contadorEnviados = document.getElementById('contador-enviados');
+        const inputBuscador = document.getElementById('input-buscador');
+
+        // Variables globales para tracking
+        let proyectoActualId = "";
+        let totalEnviados = 0;
 
         // Función para mostrar errores en pantalla (reemplazo de alert)
         function mostrarError(mensaje) {
@@ -162,6 +185,7 @@
                 const jsonCorregido = jsonStr.replace(/'/g, '"');
                 
                 firebaseConfig = JSON.parse(jsonCorregido);
+                proyectoActualId = firebaseConfig.projectId; // Guardamos ID para la memoria local
 
                 if(!firebaseConfig.projectId) {
                     throw new Error("El JSON parece válido, pero le faltan datos clave (ej. projectId). Revisa tu consola de Firebase.");
@@ -210,6 +234,8 @@
         function generarTabla(data, novios, galeriaUrl) {
             tablaInvitados.innerHTML = '';
             let contador = 0;
+            totalEnviados = 0;
+            const plantillaBase = document.getElementById('input-mensaje').value;
 
             Object.keys(data).forEach(key => {
                 const invitado = data[key];
@@ -223,21 +249,37 @@
                 
                 contador++;
 
-                // CREACIÓN DEL MENSAJE PERSONALIZADO
-                const textoMensaje = `¿Recuerdas lo increíble que la pasaste en la boda de ${novios}? En el siguiente enlace podrás encontrar tus fotos y ver lo mucho que te divertiste con ellos:\n\n${galeriaUrl}\n\nSoy Chris, el fotógrafo de ${novios}. 📸`;
+                // Validar en Memoria Local si ya se envió (NUEVO)
+                const claveMemoria = `enviado_${proyectoActualId}_${telefono}`;
+                const yaEnviado = localStorage.getItem(claveMemoria) === 'true';
+                if(yaEnviado) totalEnviados++;
+
+                // CREACIÓN DEL MENSAJE PERSONALIZADO BASADO EN LA PLANTILLA
+                let textoMensaje = plantillaBase.replace(/{novios}/g, novios).replace(/{link}/g, galeriaUrl);
                 
                 // Enlace a WhatsApp
                 const urlWa = `https://wa.me/${telefono}?text=${encodeURIComponent(textoMensaje)}`;
 
                 const tr = document.createElement('tr');
-                tr.classList.add('hover:bg-stone-50', 'transition', 'duration-150');
+                tr.classList.add('hover:bg-stone-50', 'transition', 'duration-150', 'fila-invitado');
+                
+                // Si ya fue enviado, aplicar estilos correspondientes
+                if (yaEnviado) {
+                    tr.style.opacity = '0.4';
+                    tr.style.backgroundColor = '#f5f5f4';
+                }
+
                 tr.innerHTML = `
-                    <td class="p-4 font-medium text-stone-900">${nombre}</td>
+                    <td class="p-4 font-medium text-stone-900 nombre-invitado">${nombre}</td>
                     <td class="p-4 text-stone-500 font-mono text-sm">${telefono}</td>
                     <td class="p-4 text-center">
-                        <a href="${urlWa}" target="_blank" onclick="window.marcarComoEnviado(this)" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-4 py-2.5 rounded shadow-sm transition transform active:scale-95">
-                            Enviar WhatsApp
-                        </a>
+                        ${yaEnviado ? 
+                            `<button class="inline-block bg-stone-400 text-white text-xs font-medium px-4 py-2.5 rounded shadow-sm cursor-default">Enviado ✓</button>` 
+                            : 
+                            `<a href="${urlWa}" target="_blank" data-telefono="${telefono}" onclick="window.marcarComoEnviado(this)" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-4 py-2.5 rounded shadow-sm transition transform active:scale-95">
+                                Enviar WhatsApp
+                            </a>`
+                        }
                     </td>
                 `;
                 tablaInvitados.appendChild(tr);
@@ -252,6 +294,7 @@
             // Actualizar interfaz
             tituloTablaNovios.innerText = `Invitados de ${novios}`;
             contadorInvitados.innerText = contador;
+            contadorEnviados.innerText = totalEnviados;
             
             estadoInicial.classList.add('hidden');
             contenedorTabla.classList.remove('hidden');
@@ -262,17 +305,40 @@
 
         // Función global para cambiar el estilo del botón tras hacer clic
         window.marcarComoEnviado = function(btnElement) {
+            const telefono = btnElement.getAttribute('data-telefono');
+            
+            // Guardar en memoria local
+            if (proyectoActualId && telefono) {
+                localStorage.setItem(`enviado_${proyectoActualId}_${telefono}`, 'true');
+            }
+
             const fila = btnElement.closest('tr');
             fila.style.opacity = '0.4';
             fila.style.backgroundColor = '#f5f5f4'; // stone-100
             
-            btnElement.innerText = 'Enviado ✓';
-            btnElement.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
-            btnElement.classList.add('bg-stone-400', 'cursor-default');
-            
-            // Opcional: remover el href para que no se pueda clickear de nuevo por accidente
-            // btnElement.removeAttribute('href');
+            // Actualizar contador
+            totalEnviados++;
+            contadorEnviados.innerText = totalEnviados;
+
+            // Reemplazar enlace con botón estático
+            const contenedorBtn = btnElement.parentElement;
+            contenedorBtn.innerHTML = `<button class="inline-block bg-stone-400 text-white text-xs font-medium px-4 py-2.5 rounded shadow-sm cursor-default">Enviado ✓</button>`;
         };
+
+        // Buscador en Vivo (NUEVO)
+        inputBuscador.addEventListener('keyup', function(e) {
+            const texto = e.target.value.toLowerCase();
+            const filas = document.querySelectorAll('.fila-invitado');
+            
+            filas.forEach(fila => {
+                const nombre = fila.querySelector('.nombre-invitado').innerText.toLowerCase();
+                if (nombre.includes(texto)) {
+                    fila.style.display = '';
+                } else {
+                    fila.style.display = 'none';
+                }
+            });
+        });
 
         // Función global para reiniciar la interfaz
         window.reiniciarPanel = function() {
