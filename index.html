@@ -3,38 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Envío Universal - CHRFOTOGRAFÍA</title>
+    <title>Envío de Fotos - CHRFOTOGRAFÍA</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-stone-50 text-stone-800 p-4 md:p-8 font-sans">
-    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
+<body class="bg-stone-50 text-stone-800 p-8">
+    <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
         
-        <!-- Panel Izquierdo: Configuración -->
-        <div class="w-full lg:w-1/3 bg-white p-6 rounded-xl shadow-sm border border-stone-200 h-fit">
-            <h1 class="text-2xl font-serif font-bold text-stone-900 mb-6">Configuración del Evento</h1>
-            
-            <div class="space-y-5">
+        <!-- Panel Izquierdo: Controles -->
+        <div class="md:col-span-1 space-y-6">
+            <header class="mb-4">
+                <h1 class="text-2xl font-serif font-bold text-stone-900 tracking-tight">CHRFOTOGRAFÍA</h1>
+                <p class="text-stone-500 text-sm mt-1">Panel de Envío Universal - FIRESTORE</p>
+            </header>
+
+            <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-4">
+                <h2 class="font-medium text-stone-800 text-sm flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    Configuración del Evento
+                </h2>
+                
                 <div>
-                    <label class="block text-sm font-medium text-stone-700 mb-1">Nombre de los Novios</label>
-                    <input type="text" id="input-novios" value="Alex & Estrella" class="w-full border border-stone-300 rounded-md p-2 text-sm focus:ring-stone-500 focus:border-stone-500">
+                    <label class="block text-xs text-stone-500 mb-1">Nombre de los Novios</label>
+                    <input type="text" id="input-novios" value="Alex & Estrella" class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-stone-700 mb-1">Enlace de la Galería</label>
-                    <input type="text" id="input-link" value="https://chrfotografia.pixieset.com/alexandestrella/" class="w-full border border-stone-300 rounded-md p-2 text-sm focus:ring-stone-500 focus:border-stone-500">
+                    <label class="block text-xs text-stone-500 mb-1">Enlace de la Galería</label>
+                    <input type="text" id="input-link" value="https://chrfotografia.pixieset.com/alexandestrella/" class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-stone-700 mb-1">
-                        Configuración de Firebase
-                        <span class="text-xs text-stone-500 font-normal block">Pega el código tal como te lo da Firebase. (No importa el formato)</span>
-                    </label>
-                    <textarea id="input-config" rows="6" class="w-full border border-stone-300 rounded-md p-2 text-xs font-mono focus:ring-stone-500 focus:border-stone-500" placeholder="Pega aquí el const firebaseConfig = { ... }"></textarea>
+                    <div class="flex justify-between">
+                        <label class="block text-xs text-stone-500 mb-1">Configuración de Firebase</label>
+                    </div>
+                    <textarea id="input-config" rows="6" class="w-full border border-stone-200 rounded-md p-2 text-xs font-mono text-stone-600 focus:ring-2 focus:ring-stone-900 outline-none bg-stone-50" placeholder="Pega el código de Firebase aquí..."></textarea>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-stone-700 mb-1">Plantilla del Mensaje</label>
-                    <textarea id="input-mensaje" rows="6" class="w-full border border-stone-300 rounded-md p-2 text-sm focus:ring-stone-500 focus:border-stone-500">¿Recuerdas lo increíble que la pasaste en la boda de {novios}? En el siguiente enlace podrás encontrar tus fotos y ver lo mucho que te divertiste con ellos:
+                    <label class="block text-xs text-stone-500 mb-1">Plantilla del Mensaje</label>
+                    <p class="text-[10px] text-stone-400 mb-2">Usa {novios} y {link} para que se llenen automáticamente.</p>
+                    <textarea id="input-mensaje" rows="6" class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">¿Recuerdas lo increíble que la pasaste en la boda de {novios}? En el siguiente enlace podrás encontrar tus fotos y ver lo mucho que te divertiste con ellos:
 
 {link}
 
@@ -42,174 +50,175 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-stone-700 mb-1">Nodo de la Base de Datos</label>
-                    <input type="text" id="input-nodo" value="invitados" class="w-full border border-stone-300 rounded-md p-2 text-sm focus:ring-stone-500 focus:border-stone-500">
+                    <label class="block text-xs text-stone-500 mb-1">Colección (Nodo de Base de Datos)</label>
+                    <input type="text" id="input-nodo" value="invitados" class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">
                 </div>
 
-                <!-- Caja de Alertas -->
-                <div id="caja-error" class="hidden bg-red-50 border border-red-200 text-red-700 p-3 rounded-md text-sm font-medium">
-                    <!-- Los errores de Firebase saldrán aquí -->
-                </div>
-
-                <button id="btn-conectar" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-medium py-3 rounded-md transition shadow-sm">
+                <button id="btn-conectar" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-medium py-3 rounded-md transition shadow-sm text-sm">
                     Conectar y Cargar Tabla
                 </button>
+
+                <div id="mensaje-error" class="hidden bg-red-50 border border-red-200 text-red-700 p-3 rounded-md text-xs"></div>
             </div>
         </div>
 
-        <!-- Panel Derecho: Resultados -->
-        <div class="w-full lg:w-2/3 bg-white shadow-sm rounded-xl border border-stone-200 flex flex-col h-[calc(100vh-4rem)]">
-            <div class="p-4 border-b border-stone-200 bg-stone-50 flex justify-between items-center rounded-t-xl">
-                <h2 class="font-bold text-stone-800">Lista de Invitados</h2>
-                <div class="text-sm text-stone-500 font-medium" id="contador">0 de 0 enviados</div>
-            </div>
-            
-            <div class="overflow-y-auto flex-1 p-0">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-stone-100 border-b border-stone-200 text-stone-700 text-xs uppercase tracking-wider sticky top-0">
-                        <tr>
-                            <th class="p-4">Invitado</th>
-                            <th class="p-4">Teléfono</th>
-                            <th class="p-4 text-center">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabla-invitados" class="divide-y divide-stone-100 text-sm">
-                        <tr>
-                            <td colspan="3" class="p-10 text-center text-stone-400 flex flex-col items-center">
-                                <svg class="w-12 h-12 mb-3 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                                Llena los datos del panel izquierdo y haz clic en conectar.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <!-- Panel Derecho: Tabla interactiva -->
+        <div class="md:col-span-2">
+            <div class="bg-white shadow-sm rounded-xl border border-stone-200 overflow-hidden flex flex-col h-full">
+                <div class="p-4 border-b border-stone-200 bg-stone-50 flex justify-between items-center">
+                    <h3 class="font-medium text-stone-800 text-sm">Lista de Invitados (Firestore)</h3>
+                    <div class="flex items-center gap-4">
+                        <input type="text" id="buscador" placeholder="Buscar invitado..." class="border border-stone-200 rounded-md px-3 py-1.5 text-xs focus:ring-2 focus:ring-stone-900 outline-none hidden">
+                        <span id="contador" class="text-xs text-stone-500 font-medium">0 de 0 enviados</span>
+                    </div>
+                </div>
+                
+                <div class="overflow-y-auto flex-1 p-0">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-stone-100 text-stone-500 text-[10px] uppercase tracking-wider sticky top-0 shadow-sm">
+                            <tr>
+                                <th class="p-3 pl-6 font-medium">Invitado</th>
+                                <th class="p-3 font-medium">Teléfono</th>
+                                <th class="p-3 pr-6 text-right font-medium">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-invitados" class="divide-y divide-stone-100 text-sm">
+                            <tr>
+                                <td colspan="3" class="p-12 text-center text-stone-400 text-xs">
+                                    <svg class="w-8 h-8 mx-auto mb-3 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                                    Esperando conexión
+                                    <p class="mt-1 text-[10px]">Llena los datos del panel izquierdo y haz clic en conectar.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Script sin librerías pesadas (Conexión Directa REST) -->
     <script>
-        // Función para extraer valores ignorando completamente el formato
-        function extraerValor(texto, clave) {
-            const regex = new RegExp(`${clave}\\s*:\\s*["']([^"']+)["']`);
-            const match = texto.match(regex);
-            return match ? match[1] : null;
-        }
-
         document.getElementById('btn-conectar').addEventListener('click', async () => {
             const btn = document.getElementById('btn-conectar');
-            const tabla = document.getElementById('tabla-invitados');
-            const cajaError = document.getElementById('caja-error');
+            const errorDiv = document.getElementById('mensaje-error');
+            const tbody = document.getElementById('tabla-invitados');
             
-            // Ocultar errores previos
-            cajaError.classList.add('hidden');
-            
+            const novios = document.getElementById('input-novios').value;
+            const link = document.getElementById('input-link').value;
             const configText = document.getElementById('input-config').value;
-            let nodo = document.getElementById('input-nodo').value.trim() || 'invitados';
-            
-            // Quitar diagonales del nodo si el usuario las puso por error
-            nodo = nodo.replace(/^\/|\/$/g, '');
+            const plantilla = document.getElementById('input-mensaje').value;
+            const nodo = document.getElementById('input-nodo').value.trim();
 
-            // Validar que pegaron algo
-            if (!configText.includes('projectId')) {
-                cajaError.innerHTML = "⚠️ No se detectó configuración. Pega el código que te da Firebase.";
-                cajaError.classList.remove('hidden');
+            errorDiv.classList.add('hidden');
+            btn.innerText = "Conectando con Firestore...";
+            btn.disabled = true;
+
+            // Escáner inteligente para sacar el projectId
+            const projectIdMatch = configText.match(/(?:projectId["']?\s*:\s*["'])([^"']+)/i);
+            
+            if (!projectIdMatch) {
+                errorDiv.innerHTML = "⚠️ No se encontró el 'projectId' en el texto. Asegúrate de pegar el código de Firebase completo.";
+                errorDiv.classList.remove('hidden');
+                btn.innerText = "Conectar y Cargar Tabla";
+                btn.disabled = false;
                 return;
             }
 
-            // Cambiar estado del botón
-            btn.innerText = "Conectando directo...";
-            btn.disabled = true;
-            btn.classList.add('opacity-70', 'cursor-not-allowed');
-            
-            tabla.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-stone-500 font-medium animate-pulse">Descargando datos rápidamente...</td></tr>`;
+            const projectId = projectIdMatch[1];
+            // API REST directa a Firestore
+            const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/${nodo}?pageSize=300`;
 
             try {
-                // Sacar el ID del proyecto
-                const projectId = extraerValor(configText, 'projectId');
-                let databaseURL = extraerValor(configText, 'databaseURL');
-                
-                // Si no viene la URL, la armamos con el formato estándar de Firebase
-                if (!databaseURL) {
-                    databaseURL = `https://${projectId}-default-rtdb.firebaseio.com`;
-                }
-
-                // Conexión Directa REST (Igual que en las invitaciones web simples)
-                const url = `${databaseURL}/${nodo}.json`;
-                
                 const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error(`Error de permisos o URL: ${response.status} ${response.statusText}`);
-                }
-
                 const data = await response.json();
 
-                if (data) {
-                    tabla.innerHTML = '';
-                    let total = 0;
-
-                    const novios = document.getElementById('input-novios').value;
-                    const link = document.getElementById('input-link').value;
-                    const plantilla = document.getElementById('input-mensaje').value;
-
-                    const storageKey = `enviados_${projectId}`;
-                    let enviados = JSON.parse(localStorage.getItem(storageKey) || '[]');
-
-                    // Iterar sobre los datos recibidos
-                    Object.keys(data).forEach(key => {
-                        const invitado = data[key];
-                        // Adaptarse a diferentes nombres de variables (nombre/name, telefono/phone)
-                        const nombre = invitado.nombre || invitado.name || "Invitado";
-                        const telefono = invitado.telefono || invitado.phone || invitado.whatsapp || "";
-                        
-                        if (!telefono) return;
-                        total++;
-
-                        let textoMensaje = plantilla
-                            .replace(/{novios}/g, novios)
-                            .replace(/{link}/g, link);
-                        
-                        const urlWa = `https://wa.me/${telefono}?text=${encodeURIComponent(textoMensaje)}`;
-                        const yaEnviado = enviados.includes(telefono);
-                        
-                        const tr = document.createElement('tr');
-                        tr.className = yaEnviado ? 'opacity-40 bg-stone-50' : 'hover:bg-stone-50';
-                        tr.innerHTML = `
-                            <td class="p-4 font-medium text-stone-900">${nombre}</td>
-                            <td class="p-4 text-stone-500 font-mono text-xs">${telefono}</td>
-                            <td class="p-4 text-center">
-                                <a href="${urlWa}" target="_blank" data-phone="${telefono}" data-project="${projectId}" onclick="marcarEnviado(this)" class="inline-block ${yaEnviado ? 'bg-emerald-600' : 'bg-stone-900 hover:bg-stone-800'} text-white text-xs font-medium px-4 py-2 rounded transition shadow-sm w-32">
-                                    ${yaEnviado ? 'Enviado ✓' : 'Enviar WhatsApp'}
-                                </a>
-                            </td>
-                        `;
-                        tabla.appendChild(tr);
-                    });
-
-                    document.getElementById('contador').innerText = `${enviados.length} de ${total} enviados`;
-                    
-                    if (total === 0) {
-                        tabla.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-stone-500">Se conectó, pero no hay teléfonos válidos en el nodo '${nodo}'.</td></tr>`;
-                    }
-                } else {
-                    tabla.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-amber-600 font-medium">El nodo '${nodo}' está vacío o no existe.</td></tr>`;
+                if (!response.ok) {
+                    throw new Error(data.error?.message || "Error desconocido");
                 }
+
+                if (!data.documents || data.documents.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-amber-600 font-medium text-sm">La colección '${nodo}' está vacía o no existe en Firestore.</td></tr>`;
+                    btn.innerText = "Conectar y Cargar Tabla";
+                    btn.disabled = false;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                let total = 0;
+                let enviados = 0;
+                const storageKey = `enviados_${projectId}_${nodo}`;
+                const enviadosGuardados = JSON.parse(localStorage.getItem(storageKey) || '[]');
+
+                data.documents.forEach((doc, index) => {
+                    const fields = doc.fields;
+                    if (!fields) return;
+
+                    // Firestore guarda los valores dentro de un tipo de dato (stringValue, integerValue)
+                    const extractValue = (field) => field ? (field.stringValue || field.integerValue || field.doubleValue || "") : "";
+                    
+                    // Buscar los campos típicos de nombre y teléfono
+                    const nombre = extractValue(fields.nombre || fields.name || fields.Nombre) || "Invitado";
+                    const telefono = String(extractValue(fields.telefono || fields.phone || fields.celular || fields.Telefono)).trim();
+                    const docId = doc.name.split('/').pop() || String(index);
+
+                    if (!telefono) return;
+                    total++;
+
+                    const yaEnviado = enviadosGuardados.includes(docId);
+                    if (yaEnviado) enviados++;
+
+                    let textoFinal = plantilla.replace(/{novios}/g, novios).replace(/{link}/g, link);
+                    // Personalizamos el saludo si pusiste un nombre
+                    if(textoFinal.startsWith("¿Recuerdas") && nombre !== "Invitado") {
+                         textoFinal = `¡Hola ${nombre}! ` + textoFinal;
+                    }
+
+                    const urlWa = `https://wa.me/${telefono}?text=${encodeURIComponent(textoFinal)}`;
+
+                    const tr = document.createElement('tr');
+                    tr.className = yaEnviado ? "opacity-40 bg-stone-50" : "";
+                    tr.innerHTML = `
+                        <td class="p-3 pl-6 font-medium text-stone-900">${nombre}</td>
+                        <td class="p-3 text-stone-500 font-mono text-xs">${telefono}</td>
+                        <td class="p-3 pr-6 text-right">
+                            <a href="${urlWa}" target="_blank" onclick="marcarEnviado(this, '${storageKey}', '${docId}')" 
+                               class="inline-block px-3 py-1.5 rounded-md text-xs font-medium transition shadow-sm ${yaEnviado ? 'bg-emerald-600 text-white' : 'bg-stone-900 hover:bg-stone-800 text-white'}">
+                                ${yaEnviado ? 'Enviado ✓' : 'Enviar WhatsApp'}
+                            </a>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById('contador').innerText = `${enviados} de ${total} enviados`;
+                document.getElementById('buscador').classList.remove('hidden');
 
             } catch (error) {
                 console.error(error);
-                cajaError.innerHTML = `<strong>🚨 Error de Conexión:</strong><br>Firebase bloqueó la lectura. Ve a la consola de Firebase > Realtime Database > <strong>Reglas</strong> y asegúrate de que diga <code>".read": true</code>`;
-                cajaError.classList.remove('hidden');
-                tabla.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-stone-500">Conexión rechazada. Revisa las reglas de tu base de datos.</td></tr>`;
-            } finally {
-                // Restaurar botón
-                btn.innerText = "Conectar y Cargar Tabla";
-                btn.disabled = false;
-                btn.classList.remove('opacity-70', 'cursor-not-allowed');
+                if (error.message.includes('Missing or insufficient permissions')) {
+                    errorDiv.innerHTML = `🚨 <strong>Firestore bloqueó la lectura.</strong><br>Ve a Firebase > Firestore Database > Reglas.<br>Cambia 'allow read, write: if false;' por 'allow read, write: if true;' y publica.`;
+                } else {
+                    errorDiv.innerHTML = `❌ Error: ${error.message}`;
+                }
+                errorDiv.classList.remove('hidden');
             }
+
+            btn.innerText = "Actualizar Tabla";
+            btn.disabled = false;
         });
 
-        // Función global para marcar enviados y guardarlos en memoria
-        window.marcarEnviado = function(element) {
+        // Buscador
+        document.getElementById('buscador').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filas = document.querySelectorAll('#tabla-invitados tr');
+            filas.forEach(fila => {
+                if(fila.cells.length < 3) return;
+                const texto = fila.cells[0].innerText.toLowerCase() + " " + fila.cells[1].innerText.toLowerCase();
+                fila.style.display = texto.includes(term) ? '' : 'none';
+            });
+        });
+
+        window.marcarEnviado = function(element, storageKey, docId) {
             const row = element.closest('tr');
             row.classList.add('opacity-40', 'bg-stone-50');
             
@@ -217,18 +226,16 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
             element.classList.remove('bg-stone-900', 'hover:bg-stone-800');
             element.classList.add('bg-emerald-600');
 
-            const phone = element.getAttribute('data-phone');
-            const projectId = element.getAttribute('data-project');
-            const storageKey = `enviados_${projectId}`;
-            
             let enviados = JSON.parse(localStorage.getItem(storageKey) || '[]');
-            if (!enviados.includes(phone)) {
-                enviados.push(phone);
+            if (!enviados.includes(docId)) {
+                enviados.push(docId);
                 localStorage.setItem(storageKey, JSON.stringify(enviados));
                 
-                const contadorTxt = document.getElementById('contador').innerText;
-                const total = contadorTxt.split(' de ')[1];
-                document.getElementById('contador').innerText = `${enviados.length} de ${total}`;
+                // Actualizar contador
+                const contador = document.getElementById('contador');
+                const parts = contador.innerText.split(' ');
+                parts[0] = parseInt(parts[0]) + 1;
+                contador.innerText = parts.join(' ');
             }
         }
     </script>
