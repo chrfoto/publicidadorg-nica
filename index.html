@@ -176,19 +176,31 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
 
             // 2. Validar y parsear el JSON de Firebase
             try {
+                let jsonStr = configJsonString.trim();
+                
+                // Quitar punto y coma final si el usuario lo copió por error
+                if (jsonStr.endsWith(';')) {
+                    jsonStr = jsonStr.slice(0, -1).trim();
+                }
+
                 // Agregar corchetes si el usuario olvidó ponerlos
-                let jsonStr = configJsonString;
                 if (!jsonStr.startsWith('{')) jsonStr = '{' + jsonStr;
                 if (!jsonStr.endsWith('}')) jsonStr = jsonStr + '}';
                 
                 // Intento de corregir errores comunes al copiar (ej. usar comillas simples)
-                const jsonCorregido = jsonStr.replace(/'/g, '"');
+                let jsonCorregido = jsonStr.replace(/'/g, '"');
                 
+                // MAGIA: Agregar comillas automáticamente a las palabras clave (apiKey -> "apiKey")
+                // Así ya no tienes que hacerlo tú manualmente.
+                jsonCorregido = jsonCorregido.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
+                
+                // Quitar comas finales accidentales antes de cerrar la llave
+                jsonCorregido = jsonCorregido.replace(/,\s*}/g, '}');
+
                 firebaseConfig = JSON.parse(jsonCorregido);
                 
-                // AUTO-GENERAR databaseURL si falta (¡LA SOLUCIÓN AL PROBLEMA!)
+                // AUTO-GENERAR databaseURL si falta
                 if (!firebaseConfig.databaseURL && firebaseConfig.projectId) {
-                    // Intenta con el formato estándar de bases de datos en Firebase
                     firebaseConfig.databaseURL = `https://${firebaseConfig.projectId}-default-rtdb.firebaseio.com`;
                 }
 
