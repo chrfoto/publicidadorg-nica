@@ -13,7 +13,7 @@
         <div class="md:col-span-1 space-y-6">
             <header class="mb-4">
                 <h1 class="text-2xl font-serif font-bold text-stone-900 tracking-tight">CHRFOTOGRAFÍA</h1>
-                <p class="text-stone-500 text-sm mt-1">Panel de Envío Universal - FIRESTORE</p>
+                <p class="text-stone-500 text-sm mt-1">Panel de Envío Automático - FIRESTORE</p>
             </header>
 
             <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-4">
@@ -33,29 +33,26 @@
                 </div>
 
                 <div>
-                    <div class="flex justify-between">
-                        <label class="block text-xs text-stone-500 mb-1">Configuración de Firebase</label>
-                    </div>
-                    <textarea id="input-config" rows="6" class="w-full border border-stone-200 rounded-md p-2 text-xs font-mono text-stone-600 focus:ring-2 focus:ring-stone-900 outline-none bg-stone-50" placeholder="Pega el código de Firebase aquí..."></textarea>
+                    <label class="block text-xs text-stone-500 mb-1">Configuración de Firebase</label>
+                    <textarea id="input-config" rows="5" class="w-full border border-stone-200 rounded-md p-2 text-xs font-mono text-stone-600 focus:ring-2 focus:ring-stone-900 outline-none bg-stone-50" placeholder="Pega el código de Firebase aquí..."></textarea>
                 </div>
 
                 <div>
                     <label class="block text-xs text-stone-500 mb-1">Plantilla del Mensaje</label>
-                    <p class="text-[10px] text-stone-400 mb-2">Usa {novios} y {link} para que se llenen automáticamente.</p>
-                    <textarea id="input-mensaje" rows="6" class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">¿Recuerdas lo increíble que la pasaste en la boda de {novios}? En el siguiente enlace podrás encontrar tus fotos y ver lo mucho que te divertiste con ellos:
+                    <textarea id="input-mensaje" rows="5" class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">¿Recuerdas lo increíble que la pasaste en la boda de {novios}? En el siguiente enlace podrás encontrar tus fotos y ver lo mucho que te divertiste con ellos:
 
 {link}
 
 Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                 </div>
 
-                <div>
-                    <label class="block text-xs text-stone-500 mb-1">Colección (Nodo de Base de Datos)</label>
-                    <input type="text" id="input-nodo" value="invitados" class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">
+                <div class="bg-stone-100 p-3 rounded-md">
+                    <label class="block text-[11px] font-medium text-stone-700 mb-1">Búsqueda Automática</label>
+                    <p class="text-[10px] text-stone-500">El sistema buscará por sí solo dónde están los registros (ya no necesitas adivinar rutas).</p>
                 </div>
 
                 <button id="btn-conectar" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-medium py-3 rounded-md transition shadow-sm text-sm">
-                    Conectar y Cargar Tabla
+                    Buscar y Cargar Tabla Automáticamente
                 </button>
 
                 <div id="mensaje-error" class="hidden bg-red-50 border border-red-200 text-red-700 p-3 rounded-md text-xs"></div>
@@ -66,7 +63,7 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
         <div class="md:col-span-2">
             <div class="bg-white shadow-sm rounded-xl border border-stone-200 overflow-hidden flex flex-col h-full">
                 <div class="p-4 border-b border-stone-200 bg-stone-50 flex justify-between items-center">
-                    <h3 class="font-medium text-stone-800 text-sm">Lista de Invitados (Firestore)</h3>
+                    <h3 class="font-medium text-stone-800 text-sm" id="titulo-tabla">Lista de Invitados (Automático)</h3>
                     <div class="flex items-center gap-4">
                         <input type="text" id="buscador" placeholder="Buscar invitado..." class="border border-stone-200 rounded-md px-3 py-1.5 text-xs focus:ring-2 focus:ring-stone-900 outline-none hidden">
                         <span id="contador" class="text-xs text-stone-500 font-medium">0 de 0 enviados</span>
@@ -85,9 +82,9 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                         <tbody id="tabla-invitados" class="divide-y divide-stone-100 text-sm">
                             <tr>
                                 <td colspan="3" class="p-12 text-center text-stone-400 text-xs">
-                                    <svg class="w-8 h-8 mx-auto mb-3 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
-                                    Esperando conexión
-                                    <p class="mt-1 text-[10px]">Llena los datos del panel izquierdo y haz clic en conectar.</p>
+                                    <svg class="w-8 h-8 mx-auto mb-3 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                    Listo para buscar
+                                    <p class="mt-1 text-[10px]">Pega tu configuración y haz clic en el botón de la izquierda.</p>
                                 </td>
                             </tr>
                         </tbody>
@@ -98,6 +95,51 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
     </div>
 
     <script>
+        // Función recursiva para explorar colecciones automáticamente hasta encontrar documentos con teléfonos
+        async function encontrarDocumentos(baseUrl, parentPath = '') {
+            try {
+                const res = await fetch(baseUrl + (parentPath ? '/' + parentPath : ''));
+                if (!res.ok) return [];
+                const data = await res.json();
+                
+                let documentsFound = [];
+                if (data.documents) {
+                    // Verificamos si estos documentos tienen campos de teléfono
+                    for (const doc of data.documents) {
+                        const fields = doc.fields || {};
+                        const hasPhone = Object.keys(fields).some(k => ['telefono', 'phone', 'celular', 'Telefono'].includes(k.toLowerCase()));
+                        if (hasPhone) {
+                            documentsFound.push(doc);
+                        }
+                    }
+                }
+
+                // Si encontramos documentos aquí, los regresamos
+                if (documentsFound.length > 0) return documentsFound;
+
+                // Si no, buscamos en las subcolecciones de los documentos actuales
+                if (data.documents) {
+                    for (const doc of data.documents) {
+                        const docName = doc.name.split('/').pop();
+                        const subPath = parentPath ? `${parentPath}/${docName}` : docName;
+                        
+                        // Listar subcolecciones de este documento
+                        const subRes = await fetch(`https://firestore.googleapis.com/v1/${doc.name}?mask.fieldPaths=__name__`);
+                        // Intentamos buscar rutas comunes de plantillas web (como 'public', 'data', 'rsvps')
+                        const commonPaths = ['public', 'data', 'rsvps', 'invitados', 'guests', 'registros'];
+                        for (const cp of commonPaths) {
+                            const testPath = `${subPath}/${cp}`;
+                            const found = await encontrarDocumentos(baseUrl, testPath);
+                            if (found.length > 0) return found;
+                        }
+                    }
+                }
+                return [];
+            } catch (e) {
+                return [];
+            }
+        }
+
         document.getElementById('btn-conectar').addEventListener('click', async () => {
             const btn = document.getElementById('btn-conectar');
             const errorDiv = document.getElementById('mensaje-error');
@@ -107,56 +149,85 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
             const link = document.getElementById('input-link').value;
             const configText = document.getElementById('input-config').value;
             const plantilla = document.getElementById('input-mensaje').value;
-            const nodo = document.getElementById('input-nodo').value.trim();
 
             errorDiv.classList.add('hidden');
-            btn.innerText = "Conectando con Firestore...";
+            btn.innerText = "Escaneando Firestore...";
             btn.disabled = true;
 
-            // Escáner inteligente para sacar el projectId
             const projectIdMatch = configText.match(/(?:projectId["']?\s*:\s*["'])([^"']+)/i);
             
             if (!projectIdMatch) {
-                errorDiv.innerHTML = "⚠️ No se encontró el 'projectId' en el texto. Asegúrate de pegar el código de Firebase completo.";
+                errorDiv.innerHTML = "⚠️ No se encontró el 'projectId' en el texto. Asegúrate de pegar el código de Firebase.";
                 errorDiv.classList.remove('hidden');
-                btn.innerText = "Conectar y Cargar Tabla";
+                btn.innerText = "Buscar y Cargar Tabla Automáticamente";
                 btn.disabled = false;
                 return;
             }
 
             const projectId = projectIdMatch[1];
-            // API REST directa a Firestore
-            const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/${nodo}?pageSize=300`;
+            const baseUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents`;
 
             try {
-                const response = await fetch(url);
-                const data = await response.json();
+                // Rutas inteligentes comunes donde las plantillas guardan los datos
+                const rutasPrueba = [
+                    "artifacts/" + projectId + "/public/data/rsvps",
+                    "artifacts/" + projectId + "/public",
+                    "invitados",
+                    "rsvps",
+                    "registros",
+                    "guests",
+                    "data/rsvps"
+                ];
 
-                if (!response.ok) {
-                    throw new Error(data.error?.message || "Error desconocido");
+                let documents = [];
+                let rutaEncontrada = "";
+
+                // Intentamos primero con las rutas comunes conocidas
+                for (const ruta of rutasPrueba) {
+                    const res = await fetch(`${baseUrl}/${ruta}?pageSize=300`);
+                    if (res.ok) {
+                        const json = await res.json();
+                        if (json.documents && json.documents.length > 0) {
+                            documents = json.documents;
+                            rutaEncontrada = ruta;
+                            break;
+                        }
+                    }
                 }
 
-                if (!data.documents || data.documents.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-amber-600 font-medium text-sm">La colección '${nodo}' está vacía o no existe en Firestore.</td></tr>`;
-                    btn.innerText = "Conectar y Cargar Tabla";
+                // Si no se halló de forma directa, lanzamos el buscador automático global
+                if (documents.length === 0) {
+                    const rootRes = await fetch(baseUrl);
+                    const rootJson = await rootRes.json();
+                    if (rootJson.documents) {
+                        for (const col of rootJson.documents) {
+                            const colName = col.name.split('/').pop();
+                            documents = await encontrarDocumentos(baseUrl, colName);
+                            if (documents.length > 0) break;
+                        }
+                    }
+                }
+
+                if (documents.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-amber-600 font-medium text-sm">No se encontraron registros de invitados automáticamente. Verifica que existan datos en tu Firestore.</td></tr>`;
+                    btn.innerText = "Buscar y Cargar Tabla Automáticamente";
                     btn.disabled = false;
                     return;
                 }
 
+                document.getElementById('titulo-tabla').innerText = `Lista de Invitados (Conectado)`;
                 tbody.innerHTML = '';
                 let total = 0;
                 let enviados = 0;
-                const storageKey = `enviados_${projectId}_${nodo}`;
+                const storageKey = `enviados_${projectId}`;
                 const enviadosGuardados = JSON.parse(localStorage.getItem(storageKey) || '[]');
 
-                data.documents.forEach((doc, index) => {
+                documents.forEach((doc, index) => {
                     const fields = doc.fields;
                     if (!fields) return;
 
-                    // Firestore guarda los valores dentro de un tipo de dato (stringValue, integerValue)
                     const extractValue = (field) => field ? (field.stringValue || field.integerValue || field.doubleValue || "") : "";
                     
-                    // Buscar los campos típicos de nombre y teléfono
                     const nombre = extractValue(fields.nombre || fields.name || fields.Nombre) || "Invitado";
                     const telefono = String(extractValue(fields.telefono || fields.phone || fields.celular || fields.Telefono)).trim();
                     const docId = doc.name.split('/').pop() || String(index);
@@ -168,7 +239,6 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                     if (yaEnviado) enviados++;
 
                     let textoFinal = plantilla.replace(/{novios}/g, novios).replace(/{link}/g, link);
-                    // Personalizamos el saludo si pusiste un nombre
                     if(textoFinal.startsWith("¿Recuerdas") && nombre !== "Invitado") {
                          textoFinal = `¡Hola ${nombre}! ` + textoFinal;
                     }
@@ -195,19 +265,15 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
 
             } catch (error) {
                 console.error(error);
-                if (error.message.includes('Missing or insufficient permissions')) {
-                    errorDiv.innerHTML = `🚨 <strong>Firestore bloqueó la lectura.</strong><br>Ve a Firebase > Firestore Database > Reglas.<br>Cambia 'allow read, write: if false;' por 'allow read, write: if true;' y publica.`;
-                } else {
-                    errorDiv.innerHTML = `❌ Error: ${error.message}`;
-                }
+                errorDiv.innerHTML = `🚨 <strong>Error de lectura.</strong> Revisa que las reglas de Firestore permitan la lectura (` + "`allow read, write: if true;`" + `).`;
                 errorDiv.classList.remove('hidden');
             }
 
-            btn.innerText = "Actualizar Tabla";
+            btn.innerText = "Buscar y Cargar Tabla Automáticamente";
             btn.disabled = false;
         });
 
-        // Buscador
+        // Buscador en vivo
         document.getElementById('buscador').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             const filas = document.querySelectorAll('#tabla-invitados tr');
@@ -231,7 +297,6 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                 enviados.push(docId);
                 localStorage.setItem(storageKey, JSON.stringify(enviados));
                 
-                // Actualizar contador
                 const contador = document.getElementById('contador');
                 const parts = contador.innerText.split(' ');
                 parts[0] = parseInt(parts[0]) + 1;
