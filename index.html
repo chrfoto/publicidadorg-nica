@@ -3,387 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CHRFOTOGRAFÍA - Panel de Envíos WhatsApp</title>
-    <!-- Tailwind CSS para los estilos -->
+    <title>Panel de Envío Universal - CHRFOTOGRAFÍA</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Animaciones suaves para la transición de elementos */
-        .fade-in { animation: fadeIn 0.4s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
 </head>
-<body class="bg-stone-100 text-stone-800 min-h-screen p-4 md:p-8 font-sans">
-    
-    <div class="max-w-5xl mx-auto">
+<body class="bg-stone-50 text-stone-800 p-4 md:p-8 font-sans">
+    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
         
-        <!-- Encabezado del Sistema -->
-        <header class="mb-8 text-center md:text-left">
-            <h1 class="text-3xl md:text-4xl font-serif font-bold text-stone-900 tracking-tight">CHRFOTOGRAFÍA</h1>
-            <p class="text-stone-500 mt-2">Herramienta Universal de Difusión por WhatsApp</p>
-        </header>
-
-        <!-- Contenedor Principal -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Panel Izquierdo: Configuración -->
+        <div class="w-full lg:w-1/3 bg-white p-6 rounded-xl shadow-sm border border-stone-200 h-fit">
+            <h1 class="text-2xl font-serif font-bold text-stone-900 mb-6">Configuración del Evento</h1>
             
-            <!-- SECCIÓN 1: Configuración (Columna Izquierda) -->
-            <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-stone-200 h-fit">
-                <h2 class="text-lg font-bold text-stone-800 mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    Configuración del Evento
-                </h2>
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1">Nombre de los Novios</label>
+                    <input type="text" id="input-novios" value="Alex & Estrella" class="w-full border border-stone-300 rounded-md p-2 text-sm focus:ring-stone-500 focus:border-stone-500">
+                </div>
 
-                <form id="config-form" class="space-y-4">
-                    <!-- Nombres de los novios -->
-                    <div>
-                        <label class="block text-sm font-medium text-stone-700 mb-1">Nombre de los Novios</label>
-                        <input type="text" id="input-novios" placeholder="Ej. Alex y Estrella" required class="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent transition">
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1">Enlace de la Galería</label>
+                    <input type="text" id="input-link" value="https://chrfotografia.pixieset.com/alexandestrella/" class="w-full border border-stone-300 rounded-md p-2 text-sm focus:ring-stone-500 focus:border-stone-500">
+                </div>
 
-                    <!-- Enlace de la galería -->
-                    <div>
-                        <label class="block text-sm font-medium text-stone-700 mb-1">Enlace de la Galería</label>
-                        <input type="url" id="input-galeria" placeholder="https://chrfotografia.pixieset.com/..." required class="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent transition">
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1">
+                        Configuración de Firebase
+                        <span class="text-xs text-stone-500 font-normal block">Pega el código tal como te lo da Firebase. (No importa el formato)</span>
+                    </label>
+                    <textarea id="input-config" rows="6" class="w-full border border-stone-300 rounded-md p-2 text-xs font-mono focus:ring-stone-500 focus:border-stone-500" placeholder="Pega aquí el const firebaseConfig = { ... }"></textarea>
+                </div>
 
-                    <!-- Firebase Config JSON -->
-                    <div>
-                        <label class="block text-sm font-medium text-stone-700 mb-1 flex justify-between">
-                            Configuración de Firebase (JSON)
-                            <button type="button" onclick="pegarEjemploFirebase()" class="text-xs text-blue-600 hover:underline">Ver Ejemplo</button>
-                        </label>
-                        <p class="text-xs text-stone-500 mb-2">Pega solo la parte que está entre las llaves { ... } del `firebaseConfig`.</p>
-                        <textarea id="input-firebase" rows="6" placeholder='{\n  "apiKey": "AIzaSy...",\n  "authDomain": "...",\n  "databaseURL": "...",\n  "projectId": "..."\n}' required class="w-full px-3 py-2 border border-stone-300 rounded-lg font-mono text-xs focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent transition resize-none"></textarea>
-                    </div>
-
-                    <!-- Plantilla del Mensaje (NUEVO) -->
-                    <div>
-                        <label class="block text-sm font-medium text-stone-700 mb-1">Plantilla del Mensaje</label>
-                        <p class="text-xs text-stone-500 mb-2">Usa <b>{novios}</b> y <b>{link}</b> para que se llenen automáticamente.</p>
-                        <textarea id="input-mensaje" rows="5" required class="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent transition resize-none">¿Recuerdas lo increíble que la pasaste en la boda de {novios}? En el siguiente enlace podrás encontrar tus fotos y ver lo mucho que te divertiste con ellos:
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1">Plantilla del Mensaje</label>
+                    <textarea id="input-mensaje" rows="6" class="w-full border border-stone-300 rounded-md p-2 text-sm focus:ring-stone-500 focus:border-stone-500">¿Recuerdas lo increíble que la pasaste en la boda de {novios}? En el siguiente enlace podrás encontrar tus fotos y ver lo mucho que te divertiste con ellos:
 
 {link}
 
 Soy Chris, el fotógrafo de {novios}. 📸</textarea>
-                    </div>
+                </div>
 
-                    <!-- Nombre del nodo en base de datos -->
-                    <div>
-                        <label class="block text-sm font-medium text-stone-700 mb-1">Nodo de la Base de Datos</label>
-                        <input type="text" id="input-nodo" value="invitados" required class="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent transition">
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1">Nodo de la Base de Datos</label>
+                    <input type="text" id="input-nodo" value="invitados" class="w-full border border-stone-300 rounded-md p-2 text-sm focus:ring-stone-500 focus:border-stone-500">
+                </div>
 
-                    <!-- Mensajes de Error (Ocultos por defecto) -->
-                    <div id="error-box" class="hidden bg-red-50 text-red-600 text-sm p-3 rounded-lg border border-red-200">
-                        <!-- El error se inyectará aquí -->
-                    </div>
+                <!-- Caja de Alertas -->
+                <div id="caja-error" class="hidden bg-red-50 border border-red-200 text-red-700 p-3 rounded-md text-sm font-medium">
+                    <!-- Los errores de Firebase saldrán aquí -->
+                </div>
 
-                    <!-- Botón de Acción -->
-                    <button type="submit" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-medium py-3 px-4 rounded-lg transition shadow-md flex justify-center items-center">
-                        <span id="btn-text">Conectar y Cargar Tabla</span>
-                    </button>
-                </form>
+                <button id="btn-conectar" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-medium py-3 rounded-md transition shadow-sm">
+                    Conectar y Cargar Tabla
+                </button>
             </div>
+        </div>
 
-            <!-- SECCIÓN 2: Resultados (Columna Derecha) -->
-            <div class="lg:col-span-2">
-                
-                <!-- Estado Inicial (Antes de conectar) -->
-                <div id="estado-inicial" class="bg-stone-200/50 border border-dashed border-stone-300 rounded-xl h-full min-h-[400px] flex flex-col items-center justify-center text-stone-400 p-8 text-center fade-in">
-                    <svg class="w-16 h-16 mb-4 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    <h3 class="text-lg font-medium text-stone-600">Esperando conexión</h3>
-                    <p class="text-sm mt-2 max-w-md">Llena los datos del panel izquierdo y haz clic en conectar para importar los registros del evento y generar los enlaces de WhatsApp.</p>
-                </div>
-
-                <!-- Tabla de Resultados (Oculta por defecto) -->
-                <div id="contenedor-tabla" class="hidden bg-white shadow-sm rounded-xl overflow-hidden border border-stone-200 fade-in">
-                    <div class="bg-stone-900 text-white p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <div>
-                            <h3 class="font-medium" id="titulo-tabla-novios">Invitados de [Novios]</h3>
-                            <p class="text-stone-400 text-xs mt-1">Progreso: <span id="contador-enviados" class="text-emerald-400 font-bold">0</span> / <span id="contador-invitados">0</span> enviados</p>
-                        </div>
-                        
-                        <!-- Buscador (NUEVO) -->
-                        <div class="w-full sm:w-auto relative">
-                            <input type="text" id="input-buscador" placeholder="Buscar invitado..." class="w-full sm:w-64 bg-stone-800 text-white text-sm px-3 py-1.5 rounded border border-stone-700 focus:outline-none focus:border-stone-500 transition placeholder-stone-500">
-                        </div>
-
-                        <button onclick="reiniciarPanel()" class="text-xs bg-stone-800 hover:bg-stone-700 px-3 py-1.5 rounded transition shrink-0">
-                            Cargar Otro Evento
-                        </button>
-                    </div>
-                    
-                    <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="bg-stone-50 border-b border-stone-200 text-stone-500 text-xs uppercase tracking-wider sticky top-0">
-                                <tr>
-                                    <th class="p-4 font-medium">Invitado</th>
-                                    <th class="p-4 font-medium">Teléfono</th>
-                                    <th class="p-4 font-medium text-center">Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-invitados" class="divide-y divide-stone-100 text-sm">
-                                <!-- Los registros se inyectarán aquí -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
+        <!-- Panel Derecho: Resultados -->
+        <div class="w-full lg:w-2/3 bg-white shadow-sm rounded-xl border border-stone-200 flex flex-col h-[calc(100vh-4rem)]">
+            <div class="p-4 border-b border-stone-200 bg-stone-50 flex justify-between items-center rounded-t-xl">
+                <h2 class="font-bold text-stone-800">Lista de Invitados</h2>
+                <div class="text-sm text-stone-500 font-medium" id="contador">0 de 0 enviados</div>
+            </div>
+            
+            <div class="overflow-y-auto flex-1 p-0">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-stone-100 border-b border-stone-200 text-stone-700 text-xs uppercase tracking-wider sticky top-0">
+                        <tr>
+                            <th class="p-4">Invitado</th>
+                            <th class="p-4">Teléfono</th>
+                            <th class="p-4 text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-invitados" class="divide-y divide-stone-100 text-sm">
+                        <tr>
+                            <td colspan="3" class="p-10 text-center text-stone-400 flex flex-col items-center">
+                                <svg class="w-12 h-12 mb-3 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                                Llena los datos del panel izquierdo y haz clic en conectar.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <!-- Script Principal -->
+    <!-- Firebase SDK Modular -->
     <script type="module">
-        // Importar módulos de Firebase dinámicamente
         import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Referencias a elementos del DOM
-        const form = document.getElementById('config-form');
-        const errorBox = document.getElementById('error-box');
-        const btnText = document.getElementById('btn-text');
-        
-        const estadoInicial = document.getElementById('estado-inicial');
-        const contenedorTabla = document.getElementById('contenedor-tabla');
-        const tablaInvitados = document.getElementById('tabla-invitados');
-        const tituloTablaNovios = document.getElementById('titulo-tabla-novios');
-        const contadorInvitados = document.getElementById('contador-invitados');
-        const contadorEnviados = document.getElementById('contador-enviados');
-        const inputBuscador = document.getElementById('input-buscador');
-
-        // Variables globales para tracking
-        let proyectoActualId = "";
-        let totalEnviados = 0;
-
-        // Función para mostrar errores en pantalla (reemplazo de alert)
-        function mostrarError(mensaje) {
-            errorBox.innerText = mensaje;
-            errorBox.classList.remove('hidden');
-            setTimeout(() => { errorBox.classList.add('hidden'); }, 8000);
+        // Función para extraer valores ignorando completamente el formato
+        function extraerValor(texto, clave) {
+            const regex = new RegExp(`${clave}\\s*:\\s*["']([^"']+)["']`);
+            const match = texto.match(regex);
+            return match ? match[1] : null;
         }
 
-        // Evento principal: Procesar Formulario
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        document.getElementById('btn-conectar').addEventListener('click', async () => {
+            const btn = document.getElementById('btn-conectar');
+            const tabla = document.getElementById('tabla-invitados');
+            const cajaError = document.getElementById('caja-error');
             
-            // 1. Obtener los valores ingresados
-            const novios = document.getElementById('input-novios').value.trim();
-            const galeriaUrl = document.getElementById('input-galeria').value.trim();
-            const configJsonString = document.getElementById('input-firebase').value.trim();
-            const nodoNombre = document.getElementById('input-nodo').value.trim();
+            // Ocultar errores previos
+            cajaError.classList.add('hidden');
+            
+            const configText = document.getElementById('input-config').value;
+            const nodo = document.getElementById('input-nodo').value.trim() || 'invitados';
 
-            let firebaseConfig = {};
-
-            // 2. Validar y parsear el JSON de Firebase
-            try {
-                let jsonStr = configJsonString;
-                
-                // Extraer ÚNICAMENTE la parte entre la primera llave { y la última }
-                const match = jsonStr.match(/\{[\s\S]*?\}/);
-                if (!match) {
-                    throw new Error("No se encontraron llaves { } en el texto pegado.");
-                }
-                
-                jsonStr = match[0];
-                
-                // Limpiar espacios invisibles o caracteres raros que se copian de la web
-                jsonStr = jsonStr.replace(/\u00A0/g, " ");
-                
-                // Intento de corregir errores comunes al copiar (ej. usar comillas simples)
-                let jsonCorregido = jsonStr.replace(/'/g, '"');
-                
-                // MAGIA: Agregar comillas automáticamente a las palabras clave (apiKey -> "apiKey")
-                jsonCorregido = jsonCorregido.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
-                
-                // Quitar comas finales accidentales antes de cerrar la llave
-                jsonCorregido = jsonCorregido.replace(/,\s*}/g, '}');
-
-                firebaseConfig = JSON.parse(jsonCorregido);
-                
-                // AUTO-GENERAR databaseURL si falta
-                if (!firebaseConfig.databaseURL && firebaseConfig.projectId) {
-                    firebaseConfig.databaseURL = `https://${firebaseConfig.projectId}-default-rtdb.firebaseio.com`;
-                }
-
-                proyectoActualId = firebaseConfig.projectId; // Guardamos ID para la memoria local
-
-                if(!firebaseConfig.projectId) {
-                    throw new Error("El JSON parece válido, pero le faltan datos clave (ej. projectId). Revisa tu consola de Firebase.");
-                }
-            } catch (error) {
-                mostrarError("⚠️ Error en la Configuración de Firebase. Verifica que el formato JSON sea correcto. (Faltan comillas, hay comas extra, etc.)");
-                console.error(error);
+            // Validar que pegaron algo
+            if (!configText.includes('projectId')) {
+                cajaError.innerHTML = "⚠️ No se detectó configuración de Firebase válida. Pega el código que te da la plataforma.";
+                cajaError.classList.remove('hidden');
                 return;
             }
 
-            // 3. Conectar a Firebase
-            btnText.innerText = "Conectando...";
-            errorBox.classList.add('hidden');
+            // Cambiar estado del botón
+            btn.innerText = "Conectando y descargando...";
+            btn.disabled = true;
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
 
             try {
-                // Si ya existe una app de Firebase iniciada (de un intento anterior), la borramos para iniciar con la nueva configuración
-                const appsVigentes = getApps();
-                if (appsVigentes.length > 0) {
-                    await deleteApp(appsVigentes[0]);
+                // Escáner de texto (Extrae los valores sin usar JSON.parse)
+                const projectId = extraerValor(configText, 'projectId');
+                const parsedConfig = {
+                    apiKey: extraerValor(configText, 'apiKey'),
+                    authDomain: extraerValor(configText, 'authDomain'),
+                    projectId: projectId,
+                    storageBucket: extraerValor(configText, 'storageBucket'),
+                    messagingSenderId: extraerValor(configText, 'messagingSenderId'),
+                    appId: extraerValor(configText, 'appId'),
+                    databaseURL: extraerValor(configText, 'databaseURL') || `https://${projectId}-default-rtdb.firebaseio.com`
+                };
+
+                // Reiniciar apps de Firebase si ya había una conectada (útil si cambias de boda sin recargar)
+                const apps = getApps();
+                if (apps.length > 0) {
+                    await deleteApp(apps[0]);
                 }
 
-                const app = initializeApp(firebaseConfig);
+                // Iniciar Firebase
+                const app = initializeApp(parsedConfig);
                 const db = getDatabase(app);
-                const dbRef = ref(db, nodoNombre);
+                const dbRef = ref(db, nodo);
                 
-                // 4. Obtener datos
-                btnText.innerText = "Descargando Datos...";
+                // Mostrar estado en la tabla
+                tabla.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-stone-500 font-medium animate-pulse">Descargando datos desde Firebase...</td></tr>`;
+
+                // Pedir datos (Aquí es donde se congelaba si fallaba)
                 const snapshot = await get(dbRef);
-                
+
                 if (snapshot.exists()) {
                     const data = snapshot.val();
-                    generarTabla(data, novios, galeriaUrl);
+                    tabla.innerHTML = '';
+                    let total = 0;
+
+                    const novios = document.getElementById('input-novios').value;
+                    const link = document.getElementById('input-link').value;
+                    const plantilla = document.getElementById('input-mensaje').value;
+
+                    // Recuperar el registro local para saber a quién ya le mandaste
+                    const storageKey = `enviados_${parsedConfig.projectId}`;
+                    let enviados = JSON.parse(localStorage.getItem(storageKey) || '[]');
+
+                    Object.keys(data).forEach(key => {
+                        const invitado = data[key];
+                        const nombre = invitado.nombre || invitado.name || "Invitado";
+                        const telefono = invitado.telefono || invitado.phone || "";
+                        
+                        if (!telefono) return;
+                        total++;
+
+                        // Reemplazar variables en el mensaje
+                        let textoMensaje = plantilla
+                            .replace(/{novios}/g, novios)
+                            .replace(/{link}/g, link);
+                        
+                        const urlWa = `https://wa.me/${telefono}?text=${encodeURIComponent(textoMensaje)}`;
+                        
+                        const yaEnviado = enviados.includes(telefono);
+                        
+                        const tr = document.createElement('tr');
+                        tr.className = yaEnviado ? 'opacity-40 bg-stone-50' : 'hover:bg-stone-50';
+                        tr.innerHTML = `
+                            <td class="p-4 font-medium text-stone-900">${nombre}</td>
+                            <td class="p-4 text-stone-500 font-mono text-xs">${telefono}</td>
+                            <td class="p-4 text-center">
+                                <a href="${urlWa}" target="_blank" data-phone="${telefono}" data-project="${parsedConfig.projectId}" onclick="marcarEnviado(this)" class="inline-block ${yaEnviado ? 'bg-emerald-600' : 'bg-stone-900 hover:bg-stone-800'} text-white text-xs font-medium px-4 py-2 rounded transition shadow-sm w-32">
+                                    ${yaEnviado ? 'Enviado ✓' : 'Enviar WhatsApp'}
+                                </a>
+                            </td>
+                        `;
+                        tabla.appendChild(tr);
+                    });
+
+                    document.getElementById('contador').innerText = `${enviados.length} de ${total} enviados`;
+                    
+                    if (total === 0) {
+                        tabla.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-stone-500">La base de datos se conectó, pero no se encontraron teléfonos en el nodo '${nodo}'.</td></tr>`;
+                    }
                 } else {
-                    mostrarError(`⚠️ No se encontraron registros en el nodo "${nodoNombre}". Verifica el nombre del nodo o la base de datos.`);
-                    btnText.innerText = "Conectar y Cargar Tabla";
+                    tabla.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-amber-600 font-medium">Conexión exitosa, pero el nodo '${nodo}' está vacío o no existe.</td></tr>`;
                 }
 
             } catch (error) {
-                mostrarError("⚠️ Error al conectar con Firebase. Revisa que las credenciales sean correctas y tengas permisos de lectura.");
-                console.error("Firebase Error:", error);
-                btnText.innerText = "Conectar y Cargar Tabla";
+                console.error(error);
+                let mensajeError = error.message;
+                
+                // Traducir error común de Firebase a lenguaje sencillo
+                if (mensajeError.includes("permission_denied") || mensajeError.includes("Client doesn't have permission")) {
+                    mensajeError = "🚨 PERMISO DENEGADO: Tu base de datos tiene las 'Reglas' en modo cerrado. Ve a la consola de Firebase > Realtime Database > Reglas y asegúrate de que `.read` esté en `true`.";
+                }
+                
+                cajaError.innerHTML = `<strong>Error de Firebase:</strong><br>${mensajeError}`;
+                cajaError.classList.remove('hidden');
+                tabla.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-stone-500">Error en la conexión. Revisa la alerta en el panel izquierdo.</td></tr>`;
+            } finally {
+                // Restaurar botón
+                btn.innerText = "Conectar y Cargar Tabla";
+                btn.disabled = false;
+                btn.classList.remove('opacity-70', 'cursor-not-allowed');
             }
         });
 
-        // Función para renderizar la tabla con los enlaces
-        function generarTabla(data, novios, galeriaUrl) {
-            tablaInvitados.innerHTML = '';
-            let contador = 0;
-            totalEnviados = 0;
-            const plantillaBase = document.getElementById('input-mensaje').value;
+        // Función global para marcar enviados y guardarlos en memoria
+        window.marcarEnviado = function(element) {
+            const row = element.closest('tr');
+            row.classList.add('opacity-40', 'bg-stone-50');
+            
+            element.innerText = 'Enviado ✓';
+            element.classList.remove('bg-stone-900', 'hover:bg-stone-800');
+            element.classList.add('bg-emerald-600');
 
-            Object.keys(data).forEach(key => {
-                const invitado = data[key];
+            // Guardar en el navegador
+            const phone = element.getAttribute('data-phone');
+            const projectId = element.getAttribute('data-project');
+            const storageKey = `enviados_${projectId}`;
+            
+            let enviados = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            if (!enviados.includes(phone)) {
+                enviados.push(phone);
+                localStorage.setItem(storageKey, JSON.stringify(enviados));
                 
-                // Adaptamos para soportar diferentes nombres de variables comunes
-                const nombre = invitado.nombre || invitado.name || "Invitado";
-                const telefono = invitado.telefono || invitado.phone || invitado.celular || "";
-                
-                // Solo renderizar si hay teléfono
-                if (!telefono) return;
-                
-                contador++;
-
-                // Validar en Memoria Local si ya se envió (NUEVO)
-                const claveMemoria = `enviado_${proyectoActualId}_${telefono}`;
-                const yaEnviado = localStorage.getItem(claveMemoria) === 'true';
-                if(yaEnviado) totalEnviados++;
-
-                // CREACIÓN DEL MENSAJE PERSONALIZADO BASADO EN LA PLANTILLA
-                let textoMensaje = plantillaBase.replace(/{novios}/g, novios).replace(/{link}/g, galeriaUrl);
-                
-                // Enlace a WhatsApp
-                const urlWa = `https://wa.me/${telefono}?text=${encodeURIComponent(textoMensaje)}`;
-
-                const tr = document.createElement('tr');
-                tr.classList.add('hover:bg-stone-50', 'transition', 'duration-150', 'fila-invitado');
-                
-                // Si ya fue enviado, aplicar estilos correspondientes
-                if (yaEnviado) {
-                    tr.style.opacity = '0.4';
-                    tr.style.backgroundColor = '#f5f5f4';
-                }
-
-                tr.innerHTML = `
-                    <td class="p-4 font-medium text-stone-900 nombre-invitado">${nombre}</td>
-                    <td class="p-4 text-stone-500 font-mono text-sm">${telefono}</td>
-                    <td class="p-4 text-center">
-                        ${yaEnviado ? 
-                            `<button class="inline-block bg-stone-400 text-white text-xs font-medium px-4 py-2.5 rounded shadow-sm cursor-default">Enviado ✓</button>` 
-                            : 
-                            `<a href="${urlWa}" target="_blank" data-telefono="${telefono}" onclick="window.marcarComoEnviado(this)" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-4 py-2.5 rounded shadow-sm transition transform active:scale-95">
-                                Enviar WhatsApp
-                            </a>`
-                        }
-                    </td>
-                `;
-                tablaInvitados.appendChild(tr);
-            });
-
-            if(contador === 0) {
-                mostrarError("⚠️ Se conectó a la base de datos, pero los registros no contienen números de teléfono (o los campos no se llaman 'telefono'/'phone').");
-                btnText.innerText = "Conectar y Cargar Tabla";
-                return;
+                // Actualizar contador visualmente
+                const contadorTxt = document.getElementById('contador').innerText;
+                const total = contadorTxt.split(' de ')[1];
+                document.getElementById('contador').innerText = `${enviados.length} de ${total}`;
             }
-
-            // Actualizar interfaz
-            tituloTablaNovios.innerText = `Invitados de ${novios}`;
-            contadorInvitados.innerText = contador;
-            contadorEnviados.innerText = totalEnviados;
-            
-            estadoInicial.classList.add('hidden');
-            contenedorTabla.classList.remove('hidden');
-            
-            // Restaurar botón
-            btnText.innerText = "Actualizar / Recargar";
         }
-
-        // Función global para cambiar el estilo del botón tras hacer clic
-        window.marcarComoEnviado = function(btnElement) {
-            const telefono = btnElement.getAttribute('data-telefono');
-            
-            // Guardar en memoria local
-            if (proyectoActualId && telefono) {
-                localStorage.setItem(`enviado_${proyectoActualId}_${telefono}`, 'true');
-            }
-
-            const fila = btnElement.closest('tr');
-            fila.style.opacity = '0.4';
-            fila.style.backgroundColor = '#f5f5f4'; // stone-100
-            
-            // Actualizar contador
-            totalEnviados++;
-            contadorEnviados.innerText = totalEnviados;
-
-            // Reemplazar enlace con botón estático
-            const contenedorBtn = btnElement.parentElement;
-            contenedorBtn.innerHTML = `<button class="inline-block bg-stone-400 text-white text-xs font-medium px-4 py-2.5 rounded shadow-sm cursor-default">Enviado ✓</button>`;
-        };
-
-        // Buscador en Vivo (NUEVO)
-        inputBuscador.addEventListener('keyup', function(e) {
-            const texto = e.target.value.toLowerCase();
-            const filas = document.querySelectorAll('.fila-invitado');
-            
-            filas.forEach(fila => {
-                const nombre = fila.querySelector('.nombre-invitado').innerText.toLowerCase();
-                if (nombre.includes(texto)) {
-                    fila.style.display = '';
-                } else {
-                    fila.style.display = 'none';
-                }
-            });
-        });
-
-        // Función global para reiniciar la interfaz
-        window.reiniciarPanel = function() {
-            if(confirm("¿Estás seguro de que deseas limpiar la pantalla y configurar un nuevo evento? Perderás el progreso de los mensajes enviados en esta sesión.")) {
-                document.getElementById('config-form').reset();
-                contenedorTabla.classList.add('hidden');
-                estadoInicial.classList.remove('hidden');
-                btnText.innerText = "Conectar y Cargar Tabla";
-            }
-        };
-
-        // Función de ayuda para llenar un ejemplo válido en el textarea
-        window.pegarEjemploFirebase = function() {
-            const ejemplo = `{
-  "apiKey": "AIzaSyejemplo...",
-  "authDomain": "mi-proyecto.firebaseapp.com",
-  "databaseURL": "https://mi-proyecto.firebaseio.com",
-  "projectId": "mi-proyecto",
-  "storageBucket": "mi-proyecto.appspot.com",
-  "messagingSenderId": "123456789",
-  "appId": "1:123456789:web:abcdef123456"
-}`;
-            document.getElementById('input-firebase').value = ejemplo;
-        };
-
     </script>
 </body>
 </html>
