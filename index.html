@@ -86,11 +86,8 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
         </div>
     </div>
 
-    <!-- Firebase SDK Modular -->
-    <script type="module">
-        import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
+    <!-- Script sin librerías pesadas (Conexión Directa REST) -->
+    <script>
         // Función para extraer valores ignorando completamente el formato
         function extraerValor(texto, clave) {
             const regex = new RegExp(`${clave}\\s*:\\s*["']([^"']+)["']`);
@@ -107,52 +104,47 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
             cajaError.classList.add('hidden');
             
             const configText = document.getElementById('input-config').value;
-            const nodo = document.getElementById('input-nodo').value.trim() || 'invitados';
+            let nodo = document.getElementById('input-nodo').value.trim() || 'invitados';
+            
+            // Quitar diagonales del nodo si el usuario las puso por error
+            nodo = nodo.replace(/^\/|\/$/g, '');
 
             // Validar que pegaron algo
             if (!configText.includes('projectId')) {
-                cajaError.innerHTML = "⚠️ No se detectó configuración de Firebase válida. Pega el código que te da la plataforma.";
+                cajaError.innerHTML = "⚠️ No se detectó configuración. Pega el código que te da Firebase.";
                 cajaError.classList.remove('hidden');
                 return;
             }
 
             // Cambiar estado del botón
-            btn.innerText = "Conectando y descargando...";
+            btn.innerText = "Conectando directo...";
             btn.disabled = true;
             btn.classList.add('opacity-70', 'cursor-not-allowed');
+            
+            tabla.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-stone-500 font-medium animate-pulse">Descargando datos rápidamente...</td></tr>`;
 
             try {
-                // Escáner de texto (Extrae los valores sin usar JSON.parse)
+                // Sacar el ID del proyecto
                 const projectId = extraerValor(configText, 'projectId');
-                const parsedConfig = {
-                    apiKey: extraerValor(configText, 'apiKey'),
-                    authDomain: extraerValor(configText, 'authDomain'),
-                    projectId: projectId,
-                    storageBucket: extraerValor(configText, 'storageBucket'),
-                    messagingSenderId: extraerValor(configText, 'messagingSenderId'),
-                    appId: extraerValor(configText, 'appId'),
-                    databaseURL: extraerValor(configText, 'databaseURL') || `https://${projectId}-default-rtdb.firebaseio.com`
-                };
-
-                // Reiniciar apps de Firebase si ya había una conectada (útil si cambias de boda sin recargar)
-                const apps = getApps();
-                if (apps.length > 0) {
-                    await deleteApp(apps[0]);
+                let databaseURL = extraerValor(configText, 'databaseURL');
+                
+                // Si no viene la URL, la armamos con el formato estándar de Firebase
+                if (!databaseURL) {
+                    databaseURL = `https://${projectId}-default-rtdb.firebaseio.com`;
                 }
 
-                // Iniciar Firebase
-                const app = initializeApp(parsedConfig);
-                const db = getDatabase(app);
-                const dbRef = ref(db, nodo);
+                // Conexión Directa REST (Igual que en las invitaciones web simples)
+                const url = `${databaseURL}/${nodo}.json`;
                 
-                // Mostrar estado en la tabla
-                tabla.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-stone-500 font-medium animate-pulse">Descargando datos desde Firebase...</td></tr>`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`Error de permisos o URL: ${response.status} ${response.statusText}`);
+                }
 
-                // Pedir datos (Aquí es donde se congelaba si fallaba)
-                const snapshot = await get(dbRef);
+                const data = await response.json();
 
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
+                if (data) {
                     tabla.innerHTML = '';
                     let total = 0;
 
@@ -160,25 +152,24 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                     const link = document.getElementById('input-link').value;
                     const plantilla = document.getElementById('input-mensaje').value;
 
-                    // Recuperar el registro local para saber a quién ya le mandaste
-                    const storageKey = `enviados_${parsedConfig.projectId}`;
+                    const storageKey = `enviados_${projectId}`;
                     let enviados = JSON.parse(localStorage.getItem(storageKey) || '[]');
 
+                    // Iterar sobre los datos recibidos
                     Object.keys(data).forEach(key => {
                         const invitado = data[key];
+                        // Adaptarse a diferentes nombres de variables (nombre/name, telefono/phone)
                         const nombre = invitado.nombre || invitado.name || "Invitado";
-                        const telefono = invitado.telefono || invitado.phone || "";
+                        const telefono = invitado.telefono || invitado.phone || invitado.whatsapp || "";
                         
                         if (!telefono) return;
                         total++;
 
-                        // Reemplazar variables en el mensaje
                         let textoMensaje = plantilla
                             .replace(/{novios}/g, novios)
                             .replace(/{link}/g, link);
                         
                         const urlWa = `https://wa.me/${telefono}?text=${encodeURIComponent(textoMensaje)}`;
-                        
                         const yaEnviado = enviados.includes(telefono);
                         
                         const tr = document.createElement('tr');
@@ -187,7 +178,7 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                             <td class="p-4 font-medium text-stone-900">${nombre}</td>
                             <td class="p-4 text-stone-500 font-mono text-xs">${telefono}</td>
                             <td class="p-4 text-center">
-                                <a href="${urlWa}" target="_blank" data-phone="${telefono}" data-project="${parsedConfig.projectId}" onclick="marcarEnviado(this)" class="inline-block ${yaEnviado ? 'bg-emerald-600' : 'bg-stone-900 hover:bg-stone-800'} text-white text-xs font-medium px-4 py-2 rounded transition shadow-sm w-32">
+                                <a href="${urlWa}" target="_blank" data-phone="${telefono}" data-project="${projectId}" onclick="marcarEnviado(this)" class="inline-block ${yaEnviado ? 'bg-emerald-600' : 'bg-stone-900 hover:bg-stone-800'} text-white text-xs font-medium px-4 py-2 rounded transition shadow-sm w-32">
                                     ${yaEnviado ? 'Enviado ✓' : 'Enviar WhatsApp'}
                                 </a>
                             </td>
@@ -198,24 +189,17 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                     document.getElementById('contador').innerText = `${enviados.length} de ${total} enviados`;
                     
                     if (total === 0) {
-                        tabla.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-stone-500">La base de datos se conectó, pero no se encontraron teléfonos en el nodo '${nodo}'.</td></tr>`;
+                        tabla.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-stone-500">Se conectó, pero no hay teléfonos válidos en el nodo '${nodo}'.</td></tr>`;
                     }
                 } else {
-                    tabla.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-amber-600 font-medium">Conexión exitosa, pero el nodo '${nodo}' está vacío o no existe.</td></tr>`;
+                    tabla.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-amber-600 font-medium">El nodo '${nodo}' está vacío o no existe.</td></tr>`;
                 }
 
             } catch (error) {
                 console.error(error);
-                let mensajeError = error.message;
-                
-                // Traducir error común de Firebase a lenguaje sencillo
-                if (mensajeError.includes("permission_denied") || mensajeError.includes("Client doesn't have permission")) {
-                    mensajeError = "🚨 PERMISO DENEGADO: Tu base de datos tiene las 'Reglas' en modo cerrado. Ve a la consola de Firebase > Realtime Database > Reglas y asegúrate de que `.read` esté en `true`.";
-                }
-                
-                cajaError.innerHTML = `<strong>Error de Firebase:</strong><br>${mensajeError}`;
+                cajaError.innerHTML = `<strong>🚨 Error de Conexión:</strong><br>Firebase bloqueó la lectura. Ve a la consola de Firebase > Realtime Database > <strong>Reglas</strong> y asegúrate de que diga <code>".read": true</code>`;
                 cajaError.classList.remove('hidden');
-                tabla.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-stone-500">Error en la conexión. Revisa la alerta en el panel izquierdo.</td></tr>`;
+                tabla.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-stone-500">Conexión rechazada. Revisa las reglas de tu base de datos.</td></tr>`;
             } finally {
                 // Restaurar botón
                 btn.innerText = "Conectar y Cargar Tabla";
@@ -233,7 +217,6 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
             element.classList.remove('bg-stone-900', 'hover:bg-stone-800');
             element.classList.add('bg-emerald-600');
 
-            // Guardar en el navegador
             const phone = element.getAttribute('data-phone');
             const projectId = element.getAttribute('data-project');
             const storageKey = `enviados_${projectId}`;
@@ -243,7 +226,6 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                 enviados.push(phone);
                 localStorage.setItem(storageKey, JSON.stringify(enviados));
                 
-                // Actualizar contador visualmente
                 const contadorTxt = document.getElementById('contador').innerText;
                 const total = contadorTxt.split(' de ')[1];
                 document.getElementById('contador').innerText = `${enviados.length} de ${total}`;
