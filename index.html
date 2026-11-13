@@ -31,7 +31,7 @@
                     
                     <div>
                         <label class="block text-xs text-stone-500 mb-1">Nombre de los Novios</label>
-                        <input type="text" id="input-novios" placeholder="Ej. Angel & Marlen" class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">
+                        <input type="text" id="input-novios" placeholder="Ej. Sergio & Guadalupe" class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">
                     </div>
 
                     <div>
@@ -42,6 +42,13 @@
                     <div>
                         <label class="block text-xs text-stone-500 mb-1">Configuración de Firebase</label>
                         <textarea id="input-config" rows="4" class="w-full border border-stone-200 rounded-md p-2 text-xs font-mono text-stone-600 focus:ring-2 focus:ring-stone-900 outline-none bg-stone-50" placeholder="Pega el código de Firebase aquí..."></textarea>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-xs text-stone-500">Colección / Nodo (Opcional)</label>
+                        </div>
+                        <input type="text" id="input-nodo" placeholder="Deja en blanco para auto-buscar" class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">
                     </div>
 
                     <div>
@@ -150,10 +157,11 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
             const boda = bodas[id];
             if (!boda) return;
 
-            document.getElementById('input-novios').value = boda.novios;
-            document.getElementById('input-link').value = boda.link;
-            document.getElementById('input-config').value = boda.config;
-            document.getElementById('input-mensaje').value = boda.mensaje;
+            document.getElementById('input-novios').value = boda.novios || '';
+            document.getElementById('input-link').value = boda.link || '';
+            document.getElementById('input-config').value = boda.config || '';
+            document.getElementById('input-nodo').value = boda.nodo || '';
+            document.getElementById('input-mensaje').value = boda.mensaje || '';
             document.getElementById('btn-conectar').click();
         }
 
@@ -169,6 +177,7 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                 novios: novios,
                 link: document.getElementById('input-link').value,
                 config: document.getElementById('input-config').value,
+                nodo: document.getElementById('input-nodo').value,
                 mensaje: document.getElementById('input-mensaje').value
             };
             localStorage.setItem('chr_bodas_eventos', JSON.stringify(bodas));
@@ -180,11 +189,11 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
             document.getElementById('input-novios').value = '';
             document.getElementById('input-link').value = '';
             document.getElementById('input-config').value = '';
+            document.getElementById('input-nodo').value = '';
             document.getElementById('tabla-invitados').innerHTML = `<tr><td colspan="3" class="p-16 text-center text-stone-400 text-xs">Panel limpio.</td></tr>`;
             document.getElementById('contador').innerText = "0 de 0 enviados";
         });
 
-        // Conexión Inteligente (Detecta automáticamente Realtime Database o Firestore)
         document.getElementById('btn-conectar').addEventListener('click', async () => {
             const btn = document.getElementById('btn-conectar');
             const errorDiv = document.getElementById('mensaje-error');
@@ -193,6 +202,7 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
             const novios = document.getElementById('input-novios').value;
             const link = document.getElementById('input-link').value;
             const configText = document.getElementById('input-config').value;
+            const nodoManual = document.getElementById('input-nodo').value.trim();
             const plantilla = document.getElementById('input-mensaje').value;
 
             errorDiv.classList.add('hidden');
@@ -213,14 +223,15 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
             let storageKey = `enviados_${projectId}`;
 
             try {
-                // 1. Intentar primero con Realtime Database (Método directo REST)
-                const rtdbUrl = `https://${projectId}-default-rtdb.firebaseio.com/invitados.json`;
-                const rtdbRes = await fetch(rtdbUrl);
+                // 1. Intentar primero con Realtime Database
+                const rtdbUrl = nodoManual 
+                    ? `https://${projectId}-default-rtdb.firebaseio.com/${nodoManual}.json`
+                    : `https://${projectId}-default-rtdb.firebaseio.com/invitados.json`;
                 
+                const rtdbRes = await fetch(rtdbUrl);
                 if (rtdbRes.ok) {
                     const rtdbData = await rtdbRes.json();
                     if (rtdbData) {
-                        // Puede venir como objeto o array
                         const entries = Array.isArray(rtdbData) ? rtdbData.map((v, i) => [i, v]) : Object.entries(rtdbData);
                         entries.forEach(([key, val]) => {
                             if (val && (val.telefono || val.phone || val.celular || val.Telefono)) {
@@ -234,14 +245,21 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                     }
                 }
 
-                // 2. Si no hay datos en Realtime, intentamos buscar en Firestore automáticamente
+                // 2. Si no hay datos en Realtime, buscar en Firestore
                 if (listaInvitados.length === 0) {
                     const firestoreBase = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents`;
-                    const rutasPrueba = [
-                        "artifacts/" + projectId + "/public/data/rsvps",
-                        "artifacts/" + projectId + "/public",
-                        "invitados", "rsvps", "registros", "guests"
-                    ];
+                    
+                    const rutasPrueba = [];
+                    if (nodoManual) {
+                        rutasPrueba.push(nodoManual); // Si escribiste una ruta, busca EXACTAMENTE ahí
+                    } else {
+                        // Si está en blanco, busca en las típicas
+                        rutasPrueba.push(
+                            "artifacts/" + projectId + "/public/data/rsvps",
+                            "artifacts/" + projectId + "/public",
+                            "invitados", "rsvps", "registros", "guests"
+                        );
+                    }
 
                     for (const ruta of rutasPrueba) {
                         const res = await fetch(`${firestoreBase}/${ruta}?pageSize=300`);
@@ -283,6 +301,9 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                     if (yaEnviado) enviados++;
 
                     let textoFinal = plantilla.replace(/{novios}/g, novios).replace(/{link}/g, link);
+                    if(textoFinal.startsWith("¿Recuerdas") && inv.nombre !== "Invitado") {
+                         textoFinal = `¡Hola ${inv.nombre}! ` + textoFinal;
+                    }
                     const urlWa = `https://wa.me/${inv.telefono}?text=${encodeURIComponent(textoFinal)}`;
 
                     const tr = document.createElement('tr');
