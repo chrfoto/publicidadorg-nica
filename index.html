@@ -46,9 +46,9 @@
 
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <label class="block text-xs text-stone-500">Colección / Nodo (Opcional)</label>
+                            <label class="block text-xs text-stone-500 font-bold text-indigo-600">Colección / Nodo (Opcional)</label>
                         </div>
-                        <input type="text" id="input-nodo" placeholder="Deja en blanco para auto-buscar" class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">
+                        <input type="text" id="input-nodo" placeholder="Ej: artifacts/guadalupe-sergio/public/data/rsvps" class="w-full border border-indigo-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-indigo-50">
                     </div>
 
                     <div>
@@ -194,6 +194,39 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
             document.getElementById('contador').innerText = "0 de 0 enviados";
         });
 
+        // Función recursiva de escaneo profundo automático para Firestore
+        async function encontrarDocumentos(baseUrl, parentPath = '') {
+            try {
+                const res = await fetch(baseUrl + (parentPath ? '/' + parentPath : ''));
+                if (!res.ok) return [];
+                const data = await res.json();
+                
+                let documentsFound = [];
+                if (data.documents) {
+                    for (const doc of data.documents) {
+                        const fields = doc.fields || {};
+                        const hasPhone = Object.keys(fields).some(k => ['telefono', 'phone', 'celular', 'Telefono'].includes(k.toLowerCase()));
+                        if (hasPhone) documentsFound.push(doc);
+                    }
+                }
+                if (documentsFound.length > 0) return documentsFound;
+
+                if (data.documents) {
+                    for (const doc of data.documents) {
+                        const docName = doc.name.split('/').pop();
+                        const subPath = parentPath ? `${parentPath}/${docName}` : docName;
+                        const commonPaths = ['public', 'data', 'rsvps', 'invitados', 'guests', 'registros'];
+                        for (const cp of commonPaths) {
+                            const testPath = `${subPath}/${cp}`;
+                            const found = await encontrarDocumentos(baseUrl, testPath);
+                            if (found.length > 0) return found;
+                        }
+                    }
+                }
+                return [];
+            } catch (e) { return []; }
+        }
+
         document.getElementById('btn-conectar').addEventListener('click', async () => {
             const btn = document.getElementById('btn-conectar');
             const errorDiv = document.getElementById('mensaje-error');
@@ -282,10 +315,39 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                             }
                         }
                     }
+
+                    // Escaneo profundo de emergencia si no se encontró en las rutas estáticas y no se dio un nodo manual
+                    if (listaInvitados.length === 0 && !nodoManual) {
+                        const rootRes = await fetch(firestoreBase);
+                        if (rootRes.ok) {
+                            const rootJson = await rootRes.json();
+                            if (rootJson.documents) {
+                                for (const col of rootJson.documents) {
+                                    const colName = col.name.split('/').pop();
+                                    const foundDocs = await encontrarDocumentos(firestoreBase, colName);
+                                    if (foundDocs.length > 0) {
+                                        foundDocs.forEach((doc, idx) => {
+                                            const fields = doc.fields || {};
+                                            const ext = f => f ? (f.stringValue || f.integerValue || "") : "";
+                                            const tel = String(ext(fields.telefono || fields.phone || fields.celular || fields.Telefono)).trim();
+                                            if (tel) {
+                                                listaInvitados.push({
+                                                    id: doc.name.split('/').pop() || String(idx),
+                                                    nombre: ext(fields.nombre || fields.name || fields.Nombre) || "Invitado",
+                                                    telefono: tel
+                                                });
+                                            }
+                                        });
+                                        if (listaInvitados.length > 0) break;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 if (listaInvitados.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-amber-600 font-medium text-sm">No se encontraron invitados. Verifica que la base de datos tenga registros.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-amber-600 font-medium text-sm">No se encontraron invitados. Verifica la ruta en el campo Colección/Nodo o que la base de datos tenga registros.</td></tr>`;
                     btn.innerText = "Cargar Invitados";
                     btn.disabled = false;
                     return;
@@ -326,7 +388,7 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
 
             } catch (error) {
                 console.error(error);
-                errorDiv.innerHTML = `🚨 Error de conexión con Firebase.`;
+                errorDiv.innerHTML = `🚨 Error de conexión con Firebase. Verifica tus reglas.`;
                 errorDiv.classList.remove('hidden');
             }
 
