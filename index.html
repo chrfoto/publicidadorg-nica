@@ -40,6 +40,11 @@
                     </div>
 
                     <div>
+                        <label class="block text-xs text-stone-500 mb-1">Código de Descarga (PIN)</label>
+                        <input type="text" id="input-codigo" placeholder="Ej. 8509" class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">
+                    </div>
+
+                    <div>
                         <label class="block text-xs text-stone-500 mb-1">Configuración de Firebase</label>
                         <textarea id="input-config" rows="4" class="w-full border border-stone-200 rounded-md p-2 text-xs font-mono text-stone-600 focus:ring-2 focus:ring-stone-900 outline-none bg-stone-50" placeholder="Pega el código de Firebase aquí..."></textarea>
                     </div>
@@ -53,8 +58,10 @@
 
                     <div>
                         <label class="block text-xs text-stone-500 mb-1">Plantilla del Mensaje</label>
-                        <textarea id="input-mensaje" rows="4" class="w-full border border-stone-200 rounded-md p-2 text-sm focus:ring-2 focus:ring-stone-900 outline-none">{link}
-Código de descarga: 8509
+                        <textarea id="input-mensaje" rows="6" readonly class="w-full border border-stone-200 rounded-md p-2 text-sm bg-stone-100 text-stone-600 outline-none resize-none focus:ring-0">¿Recuerdas lo increíble que la pasaste en la boda de {novios}? En el siguiente enlace podrás encontrar tus fotos y ver lo mucho que te divertiste con ellos:
+
+{link}
+Código de descarga: {codigo}
 
 Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                     </div>
@@ -162,9 +169,9 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
 
             document.getElementById('input-novios').value = boda.novios || '';
             document.getElementById('input-link').value = boda.link || '';
+            document.getElementById('input-codigo').value = boda.codigo || '';
             document.getElementById('input-config').value = boda.config || '';
             document.getElementById('input-nodo').value = boda.nodo || '';
-            document.getElementById('input-mensaje').value = boda.mensaje || '';
             document.getElementById('btn-conectar').click();
         }
 
@@ -179,9 +186,9 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
             bodas[id] = {
                 novios: novios,
                 link: document.getElementById('input-link').value,
+                codigo: document.getElementById('input-codigo').value,
                 config: document.getElementById('input-config').value,
-                nodo: document.getElementById('input-nodo').value,
-                mensaje: document.getElementById('input-mensaje').value
+                nodo: document.getElementById('input-nodo').value
             };
             localStorage.setItem('chr_bodas_eventos', JSON.stringify(bodas));
             renderPestanas();
@@ -191,6 +198,7 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
         document.getElementById('btn-nuevo').addEventListener('click', () => {
             document.getElementById('input-novios').value = '';
             document.getElementById('input-link').value = '';
+            document.getElementById('input-codigo').value = '';
             document.getElementById('input-config').value = '';
             document.getElementById('input-nodo').value = '';
             document.getElementById('tabla-invitados').innerHTML = `<tr><td colspan="3" class="p-16 text-center text-stone-400 text-xs">Panel limpio.</td></tr>`;
@@ -238,6 +246,7 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
             
             const novios = document.getElementById('input-novios').value;
             const link = document.getElementById('input-link').value;
+            const codigo = document.getElementById('input-codigo').value.trim();
             const configText = document.getElementById('input-config').value;
             const nodoManual = document.getElementById('input-nodo').value.trim();
             const plantilla = document.getElementById('input-mensaje').value;
@@ -411,9 +420,15 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                     const yaEnviado = enviadosGuardados.includes(inv.id);
                     if (yaEnviado) enviados++;
 
-                    let textoFinal = plantilla.replace(/{novios}/g, novios).replace(/{link}/g, link);
-                    if(textoFinal.startsWith("¿Recuerdas") && inv.nombre !== "Invitado") {
+                    let textoFinal = plantilla
+                        .replace(/{novios}/g, novios)
+                        .replace(/{link}/g, link)
+                        .replace(/{codigo}/g, codigo || '');
+                        
+                    if(inv.nombre !== "Invitado") {
                          textoFinal = `¡Hola ${inv.nombre}! ` + textoFinal;
+                    } else {
+                         textoFinal = `¡Hola! ` + textoFinal;
                     }
                     const urlWa = `https://wa.me/${inv.telefono}?text=${encodeURIComponent(textoFinal)}`;
 
