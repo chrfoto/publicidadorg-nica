@@ -67,6 +67,9 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                             Cargar Invitados
                         </button>
                     </div>
+                    
+                    <!-- Indicador de búsqueda agregado -->
+                    <div id="status-busqueda" class="text-[10px] text-stone-400 text-center font-mono h-4"></div>
 
                     <div id="mensaje-error" class="hidden bg-red-50 border border-red-200 text-red-700 p-3 rounded-md text-xs"></div>
                 </div>
@@ -230,6 +233,7 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
         document.getElementById('btn-conectar').addEventListener('click', async () => {
             const btn = document.getElementById('btn-conectar');
             const errorDiv = document.getElementById('mensaje-error');
+            const statusDiv = document.getElementById('status-busqueda');
             const tbody = document.getElementById('tabla-invitados');
             
             const novios = document.getElementById('input-novios').value;
@@ -239,13 +243,16 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
             const plantilla = document.getElementById('input-mensaje').value;
 
             errorDiv.classList.add('hidden');
+            statusDiv.innerHTML = "Iniciando diagnóstico...";
             btn.innerText = "Conectando...";
             btn.disabled = true;
+            let logDiagnostico = [];
 
             const projectIdMatch = configText.match(/(?:projectId["']?\s*:\s*["'])([^"']+)/i);
             if (!projectIdMatch) {
                 errorDiv.innerHTML = "⚠️ Falta el 'projectId' en la configuración de Firebase.";
                 errorDiv.classList.remove('hidden');
+                statusDiv.innerText = "";
                 btn.innerText = "Cargar Invitados";
                 btn.disabled = false;
                 return;
@@ -254,109 +261,147 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
             const projectId = projectIdMatch[1];
             let listaInvitados = [];
             let storageKey = `enviados_${projectId}`;
+            let errorSeguridad = false;
 
             try {
-                // 1. Intentar primero con Realtime Database
+                // 1. ESCÁNER RTDB
                 try {
-                    const rtdbUrl = nodoManual 
-                        ? `https://${projectId}-default-rtdb.firebaseio.com/${nodoManual}.json`
-                        : `https://${projectId}-default-rtdb.firebaseio.com/invitados.json`;
-                    
-                    const rtdbRes = await fetch(rtdbUrl);
-                    if (rtdbRes.ok) {
-                        const rtdbData = await rtdbRes.json();
-                        if (rtdbData) {
-                            const entries = Array.isArray(rtdbData) ? rtdbData.map((v, i) => [i, v]) : Object.entries(rtdbData);
-                            entries.forEach(([key, val]) => {
-                                if (val && (val.telefono || val.phone || val.celular || val.Telefono)) {
-                                    listaInvitados.push({
-                                        id: String(key),
-                                        nombre: val.nombre || val.name || val.Nombre || "Invitado",
-                                        telefono: String(val.telefono || val.phone || val.celular || val.Telefono).trim()
+                    let rtdbBases = [];
+                    const dbUrlMatch = configText.match(/(?:databaseURL["']?\s*:\s*["'])([^"']+)/i);
+                    if (dbUrlMatch) {
+                        rtdbBases.push(dbUrlMatch[1].replace(/\/+$/, ''));
+                    } else {
+                        rtdbBases.push(`https://${projectId}-default-rtdb.firebaseio.com`);
+                        rtdbBases.push(`https://${projectId}.firebaseio.com`); 
+                    }
+
+                    let rutasRtdb = nodoManual ? [nodoManual.replace(/^\/+/, '')] : ["invitados", "rsvps", "registros", "data/rsvps", ""];
+
+                    function extraerInvitadosCapaPorCapa(obj) {
+                        let encontrados = [];
+                        function buscarEnCapas(nodo, pathId) {
+                            if (!nodo || typeof nodo !== 'object') return;
+                            const keys = Object.keys(nodo);
+                            const regexTel = /^(tel[eé]fono|phone|celular|whatsapp|tel|n[uú]mero|num)$/i;
+                            const regexNom = /^(nombre|name|invitado|nombres|guest)$/i;
+                            const phoneKey = keys.find(k => regexTel.test(k));
+                            
+                            if (phoneKey && nodo[phoneKey]) {
+                                const telStr = String(nodo[phoneKey]).trim();
+                                if (telStr.length >= 7) { 
+                                    const nameKey = keys.find(k => regexNom.test(k));
+                                    encontrados.push({
+                                        id: nodo.id || pathId || Math.random().toString(36).substr(2, 9),
+                                        nombre: nameKey ? String(nodo[nameKey]).trim() : "Invitado",
+                                        telefono: telStr
                                     });
+                                    return;
                                 }
-                            });
+                            }
+                            for (let k of keys) { buscarEnCapas(nodo[k], k); }
+                        }
+                        buscarEnCapas(obj, "root");
+                        return encontrados;
+                    }
+
+                    for (const rtdbBase of rtdbBases) {
+                        for (const ruta of rutasRtdb) {
+                            if (listaInvitados.length > 0) break;
+                            try {
+                                const fetchUrl = ruta ? `${rtdbBase}/${ruta}.json` : `${rtdbBase}/.json`;
+                                logDiagnostico.push(`Probando RTDB: ${fetchUrl}`);
+                                const rtdbRes = await fetch(fetchUrl);
+                                
+                                if (rtdbRes.status === 401 || rtdbRes.status === 403) {
+                                    logDiagnostico.push(`❌ RTDB bloqueado (Error 401/403). Reglas cerradas.`);
+                                    errorSeguridad = true;
+                                } else if (rtdbRes.ok) {
+                                    const rtdbData = await rtdbRes.json();
+                                    if(rtdbData) {
+                                        const extraidos = extraerInvitadosCapaPorCapa(rtdbData);
+                                        if (extraidos.length > 0) {
+                                            listaInvitados = extraidos;
+                                            logDiagnostico.push(`✅ ¡Éxito! Encontrados en RTDB.`);
+                                            break;
+                                        } else {
+                                            logDiagnostico.push(`⚠️ Carpeta vacía o sin teléfonos en RTDB.`);
+                                        }
+                                    }
+                                } else {
+                                    logDiagnostico.push(`⚠️ RTDB Respondió: ${rtdbRes.status}`);
+                                }
+                            } catch(e) { 
+                                logDiagnostico.push(`⚠️ RTDB No existe o falló red.`);
+                            }
                         }
                     }
-                } catch (e) {
-                    console.log("Realtime Database no activada en este proyecto, pasando a Firestore...");
-                }
+                } catch (e) {}
 
-                // 2. Si no hay datos en Realtime, buscar en Firestore
+                // 2. ESCÁNER FIRESTORE
                 if (listaInvitados.length === 0) {
                     const firestoreBase = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents`;
-                    
-                    const rutasPrueba = [];
-                    if (nodoManual) {
-                        rutasPrueba.push(nodoManual); // Si escribiste una ruta, busca EXACTAMENTE ahí
-                    } else {
-                        // Si está en blanco, busca en las típicas
-                        rutasPrueba.push(
-                            "artifacts/" + projectId + "/public/data/rsvps",
-                            "artifacts/" + projectId + "/public",
-                            "invitados", "rsvps", "registros", "guests"
-                        );
-                    }
+                    const rutasPrueba = nodoManual ? [nodoManual.replace(/^\/+/, '')] : [
+                        "artifacts/" + projectId + "/public/data/rsvps",
+                        "artifacts/" + projectId + "/public",
+                        "invitados", "rsvps", "registros", "guests"
+                    ];
 
                     for (const ruta of rutasPrueba) {
-                        const res = await fetch(`${firestoreBase}/${ruta}?pageSize=300`);
-                        if (res.ok) {
-                            const json = await res.json();
-                            if (json.documents && json.documents.length > 0) {
-                                json.documents.forEach((doc, idx) => {
-                                    const fields = doc.fields || {};
-                                    const ext = f => f ? (f.stringValue || f.integerValue || "") : "";
-                                    const tel = String(ext(fields.telefono || fields.phone || fields.celular || fields.Telefono)).trim();
-                                    if (tel) {
-                                        listaInvitados.push({
-                                            id: doc.name.split('/').pop() || String(idx),
-                                            nombre: ext(fields.nombre || fields.name || fields.Nombre) || "Invitado",
-                                            telefono: tel
-                                        });
+                        try {
+                            const fsUrl = `${firestoreBase}/${ruta}?pageSize=300`;
+                            logDiagnostico.push(`Probando Firestore: /${ruta}`);
+                            const res = await fetch(fsUrl);
+                            
+                            if (res.status === 403) {
+                                logDiagnostico.push(`❌ Firestore bloqueado (Error 403). Reglas cerradas.`);
+                                errorSeguridad = true;
+                            } else if (res.ok) {
+                                const json = await res.json();
+                                if (json.documents && json.documents.length > 0) {
+                                    json.documents.forEach((doc, idx) => {
+                                        const fields = doc.fields || {};
+                                        const ext = f => f ? (f.stringValue || f.integerValue || "") : "";
+                                        const tel = String(ext(fields.telefono || fields.phone || fields.celular || fields.Telefono)).trim();
+                                        if (tel) {
+                                            listaInvitados.push({
+                                                id: doc.name.split('/').pop() || String(idx),
+                                                nombre: ext(fields.nombre || fields.name || fields.Nombre) || "Invitado",
+                                                telefono: tel
+                                            });
+                                        }
+                                    });
+                                    if (listaInvitados.length > 0) {
+                                        logDiagnostico.push(`✅ ¡Éxito! Encontrados en Firestore.`);
+                                        break;
                                     }
-                                });
-                                if (listaInvitados.length > 0) break;
-                            }
-                        }
-                    }
-
-                    // Escaneo profundo de emergencia si no se encontró en las rutas estáticas y no se dio un nodo manual
-                    if (listaInvitados.length === 0 && !nodoManual) {
-                        const rootRes = await fetch(firestoreBase);
-                        if (rootRes.ok) {
-                            const rootJson = await rootRes.json();
-                            if (rootJson.documents) {
-                                for (const col of rootJson.documents) {
-                                    const colName = col.name.split('/').pop();
-                                    const foundDocs = await encontrarDocumentos(firestoreBase, colName);
-                                    if (foundDocs.length > 0) {
-                                        foundDocs.forEach((doc, idx) => {
-                                            const fields = doc.fields || {};
-                                            const ext = f => f ? (f.stringValue || f.integerValue || "") : "";
-                                            const tel = String(ext(fields.telefono || fields.phone || fields.celular || fields.Telefono)).trim();
-                                            if (tel) {
-                                                listaInvitados.push({
-                                                    id: doc.name.split('/').pop() || String(idx),
-                                                    nombre: ext(fields.nombre || fields.name || fields.Nombre) || "Invitado",
-                                                    telefono: tel
-                                                });
-                                            }
-                                        });
-                                        if (listaInvitados.length > 0) break;
-                                    }
+                                } else {
+                                    logDiagnostico.push(`⚠️ Carpeta de Firestore existe pero está vacía.`);
                                 }
+                            } else {
+                                logDiagnostico.push(`⚠️ Firestore Respondió: ${res.status}`);
                             }
+                        } catch (e) {
+                             logDiagnostico.push(`⚠️ Error de red con Firestore.`);
                         }
                     }
                 }
 
                 if (listaInvitados.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-amber-600 font-medium text-sm">No se encontraron invitados. Verifica la ruta en el campo Colección/Nodo o que la base de datos tenga registros.</td></tr>`;
+                    let mensajeFinal = `No se encontraron invitados.`;
+                    if (errorSeguridad) {
+                        mensajeFinal = `🚨 <strong>¡ACCESO DENEGADO (Error 403)!</strong><br>El panel encontró tu base de datos, pero Firebase bloqueó la lectura. Revisa que las Reglas estén en <code>allow read, write: if true;</code> y publicadas.`;
+                        errorDiv.innerHTML = mensajeFinal;
+                        errorDiv.classList.remove('hidden');
+                    }
+                    
+                    statusDiv.innerHTML = `<button onclick="alert('${logDiagnostico.join('\\n')}')" class="text-indigo-500 underline cursor-pointer">Ver diagnóstico detallado</button>`;
+                    tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-amber-600 font-medium text-sm">No se pudieron extraer datos. Usa el botón de diagnóstico arriba.</td></tr>`;
                     btn.innerText = "Cargar Invitados";
                     btn.disabled = false;
                     return;
                 }
 
+                statusDiv.innerHTML = `<span class="text-emerald-600">¡${listaInvitados.length} Registros encontrados!</span> <button onclick="alert('${logDiagnostico.join('\\n')}')" class="text-stone-400 underline cursor-pointer ml-2">Ver log</button>`;
                 document.getElementById('titulo-tabla').innerText = `Lista de Invitados - ${novios}`;
                 tbody.innerHTML = '';
                 let enviados = 0;
@@ -392,6 +437,7 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
 
             } catch (error) {
                 console.error(error);
+                statusDiv.innerText = `Error en la conexión.`;
                 errorDiv.innerHTML = `🚨 Error de conexión con Firebase. Verifica tus reglas.`;
                 errorDiv.classList.remove('hidden');
             }
