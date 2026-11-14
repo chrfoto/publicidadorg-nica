@@ -257,25 +257,29 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
 
             try {
                 // 1. Intentar primero con Realtime Database
-                const rtdbUrl = nodoManual 
-                    ? `https://${projectId}-default-rtdb.firebaseio.com/${nodoManual}.json`
-                    : `https://${projectId}-default-rtdb.firebaseio.com/invitados.json`;
-                
-                const rtdbRes = await fetch(rtdbUrl);
-                if (rtdbRes.ok) {
-                    const rtdbData = await rtdbRes.json();
-                    if (rtdbData) {
-                        const entries = Array.isArray(rtdbData) ? rtdbData.map((v, i) => [i, v]) : Object.entries(rtdbData);
-                        entries.forEach(([key, val]) => {
-                            if (val && (val.telefono || val.phone || val.celular || val.Telefono)) {
-                                listaInvitados.push({
-                                    id: String(key),
-                                    nombre: val.nombre || val.name || val.Nombre || "Invitado",
-                                    telefono: String(val.telefono || val.phone || val.celular || val.Telefono).trim()
-                                });
-                            }
-                        });
+                try {
+                    const rtdbUrl = nodoManual 
+                        ? `https://${projectId}-default-rtdb.firebaseio.com/${nodoManual}.json`
+                        : `https://${projectId}-default-rtdb.firebaseio.com/invitados.json`;
+                    
+                    const rtdbRes = await fetch(rtdbUrl);
+                    if (rtdbRes.ok) {
+                        const rtdbData = await rtdbRes.json();
+                        if (rtdbData) {
+                            const entries = Array.isArray(rtdbData) ? rtdbData.map((v, i) => [i, v]) : Object.entries(rtdbData);
+                            entries.forEach(([key, val]) => {
+                                if (val && (val.telefono || val.phone || val.celular || val.Telefono)) {
+                                    listaInvitados.push({
+                                        id: String(key),
+                                        nombre: val.nombre || val.name || val.Nombre || "Invitado",
+                                        telefono: String(val.telefono || val.phone || val.celular || val.Telefono).trim()
+                                    });
+                                }
+                            });
+                        }
                     }
+                } catch (e) {
+                    console.log("Realtime Database no activada en este proyecto, pasando a Firestore...");
                 }
 
                 // 2. Si no hay datos en Realtime, buscar en Firestore
