@@ -162,17 +162,22 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
             });
         }
 
-        function cargarBodaEnPanel(id) {
+        function cargarBodaEnPanel(id, autoConnect = true) {
             const bodas = obtenerBodsGuardadas();
             const boda = bodas[id];
             if (!boda) return;
+
+            localStorage.setItem('chr_last_boda', id); // Recordar la última boda en pantalla
 
             document.getElementById('input-novios').value = boda.novios || '';
             document.getElementById('input-link').value = boda.link || '';
             document.getElementById('input-codigo').value = boda.codigo || '';
             document.getElementById('input-config').value = boda.config || '';
             document.getElementById('input-nodo').value = boda.nodo || '';
-            document.getElementById('btn-conectar').click();
+            
+            if (autoConnect) {
+                document.getElementById('btn-conectar').click();
+            }
         }
 
         document.getElementById('btn-guardar').addEventListener('click', () => {
@@ -191,11 +196,13 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
                 nodo: document.getElementById('input-nodo').value
             };
             localStorage.setItem('chr_bodas_eventos', JSON.stringify(bodas));
+            localStorage.setItem('chr_last_boda', id); // Recordar como activa
             renderPestanas();
             alert(`¡Boda de ${novios} guardada!`);
         });
 
         document.getElementById('btn-nuevo').addEventListener('click', () => {
+            localStorage.removeItem('chr_last_boda'); // Limpiar memoria de última boda
             document.getElementById('input-novios').value = '';
             document.getElementById('input-link').value = '';
             document.getElementById('input-codigo').value = '';
@@ -250,6 +257,22 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
             const configText = document.getElementById('input-config').value;
             const nodoManual = document.getElementById('input-nodo').value.trim();
             const plantilla = document.getElementById('input-mensaje').value;
+
+            // Auto-guardar la información al conectar para que nunca se pierda nada al refrescar
+            if (novios) {
+                const id = novios.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                const bodas = obtenerBodsGuardadas();
+                bodas[id] = {
+                    novios: novios,
+                    link: link,
+                    codigo: codigo,
+                    config: configText,
+                    nodo: nodoManual
+                };
+                localStorage.setItem('chr_bodas_eventos', JSON.stringify(bodas));
+                localStorage.setItem('chr_last_boda', id);
+                renderPestanas();
+            }
 
             errorDiv.classList.add('hidden');
             statusDiv.innerHTML = "Iniciando diagnóstico...";
@@ -490,6 +513,12 @@ Soy Chris, el fotógrafo de {novios}. 📸</textarea>
         }
 
         renderPestanas();
+
+        // Recuperar automáticamente la última boda en la que estabas trabajando al recargar la página
+        const lastBoda = localStorage.getItem('chr_last_boda');
+        if (lastBoda) {
+            cargarBodaEnPanel(lastBoda, false); // Carga los textos pero espera a que tú des clic en conectar
+        }
     </script>
 </body>
 </html>
